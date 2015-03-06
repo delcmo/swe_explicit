@@ -31,16 +31,16 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     _Ce(getParam<Real>("Ce")),
     _g(getParam<Real>("gravity")),
     // Coupled variables
-    _h(coupledValue("h")),
-    _hu(coupledValue("hu")),
-    _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
+    _h(coupledValueOld("h")),
+    _hu(coupledValueOld("hu")),
+    _hv(_mesh.dimension() == 2 ? coupledValueOld("hv") : _zero),
     // Coupled aux variables: entropy
     _E(coupledValue("entropy")),
     _E_old(coupledValueOld("entropy")),
     _E_older(coupledValueOlder("entropy")),
     // Coupled aux variables: entropy flux
-    _F_grad(coupledGradient("F")),
-    _G_grad(_mesh.dimension() == 2 ? coupledGradient("G") : _grad_zero),
+    _F_grad(coupledGradientOld("F")),
+    _G_grad(_mesh.dimension() == 2 ? coupledGradientOld("G") : _grad_zero),
     // Coupled aux variables: topology
     _b(isCoupled("b") ? coupledValue("b") : _zero),
     // Equation of state:
@@ -70,13 +70,8 @@ EntropyViscosityCoefficient::computeQpProperties()
   // First-order viscosity coefficient
   _kappa_max[_qp] = 0.5*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
 
-  // Weights for BDF2
-  Real w0 = _t_step > 1 ? (2.*_dt+_dt_old)/(_dt*(_dt+_dt_old)) : 1. / _dt;
-  Real w1 = _t_step > 1 ? -(_dt+_dt_old)/(_dt*_dt_old) : -1. / _dt;
-  Real w2 = _t_step > 1 ? _dt/(_dt_old*(_dt+_dt_old)) : 0.;
-
   // Entropy residual
-  Real residual = w0*_E[_qp]+w1*_E_old[_qp]+w2*_E_older[_qp];
+  Real residual = (_E_old[_qp]+_E_older[_qp])/_dt;
   residual += _F_grad[_qp](0)+_G_grad[_qp](1);
   _residual[_qp] = std::fabs(residual);
 

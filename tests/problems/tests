@@ -1,0 +1,13 @@
+[Tests]
+  [./1d-pb-variable-depth-riverbed-fo]
+    type = 'Exodiff'
+    input = '1d-pb-variable-depth-riverbed-fo.i'
+    exodiff = '1d-pb-variable-depth-riverbed-fo_out.e'
+  [../]
+
+  [./1d-dam-break-pb-with-variable-depth-riverbed-fo]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb-with-variable-depth-riverbed-fo.i'
+    exodiff = '1d-dam-break-pb-with-variable-depth-riverbed-fo_out.e'
+  [../]
+[]

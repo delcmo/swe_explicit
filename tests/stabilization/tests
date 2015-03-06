@@ -1,0 +1,31 @@
+[Tests]
+  [./1d-dam-break-pb]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb.i'
+    exodiff = '1d-dam-break-pb_out.e'
+  [../]
+
+  [./1d-dam-break-pb-lapidus]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb-lapidus.i'
+    exodiff = '1d-dam-break-pb-lapidus_out.e'
+  [../]
+
+  [./1d-dam-break-pb-pressure-jst]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb-pressure-jst.i'
+    exodiff = '1d-dam-break-pb-pressure-jst_out.e'
+  [../]
+
+  [./1d-dam-break-pb-pressure-hmp]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb-pressure-hmp.i'
+    exodiff = '1d-dam-break-pb-pressure-hmp_out.e'
+  [../]
+
+  [./1d-dam-break-pb-pressure-st]
+    type = 'Exodiff'
+    input = '1d-dam-break-pb-pressure-st.i'
+    exodiff = '1d-dam-break-pb-pressure-st_out.e'
+  [../]
+[]

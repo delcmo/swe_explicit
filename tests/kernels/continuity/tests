@@ -1,0 +1,13 @@
+[Tests]
+  [./1d-continuity-constant-solution]
+    type = 'Exodiff'
+    input = '1d-continuity-cst-sol.i'
+    exodiff = '1d-continuity-cst-sol_out.e'
+  [../]
+
+  [./1d-continuity]
+    type = 'Exodiff'
+    input = '1d-continuity.i'
+    exodiff = '1d-continuity_out.e'
+  [../]
+[]

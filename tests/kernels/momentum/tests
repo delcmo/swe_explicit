@@ -1,0 +1,13 @@
+[Tests]
+  [./1d-no-stabilization]
+    type = 'Exodiff'
+    input = '1d-no-stabilization.i'
+    exodiff = '1d-no-stabilization_out.e'
+  [../]
+
+  [./2d-fo]
+    type = 'Exodiff'
+    input = '2d-fo.i'
+    exodiff = '2d-fo_out.e'
+  [../]
+[]

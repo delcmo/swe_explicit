@@ -1,0 +1,49 @@
+#include "SweExplicitApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+#include "ModulesApp.h"
+
+template<>
+InputParameters validParams<SweExplicitApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+SweExplicitApp::SweExplicitApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  ModulesApp::registerObjects(_factory);
+  SweExplicitApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  ModulesApp::associateSyntax(_syntax, _action_factory);
+  SweExplicitApp::associateSyntax(_syntax, _action_factory);
+}
+
+SweExplicitApp::~SweExplicitApp()
+{
+}
+
+extern "C" void SweExplicitApp__registerApps() { SweExplicitApp::registerApps(); }
+void
+SweExplicitApp::registerApps()
+{
+  registerApp(SweExplicitApp);
+}
+
+void
+SweExplicitApp::registerObjects(Factory & factory)
+{
+}
+
+void
+SweExplicitApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}

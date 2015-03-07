@@ -19,6 +19,7 @@ public:
   virtual ~PressureBasedViscosityCoefficient();
 
 protected:
+  virtual void initQpStatefulProperties();   
   virtual void computeQpProperties();
 
   // Pressure-based viscosity type:
@@ -48,6 +49,7 @@ protected:
   const EquationOfState & _eos;
 
   // material to compute
+  MaterialProperty<Real> & _kappa_old;
   MaterialProperty<Real> & _kappa;
   MaterialProperty<Real> & _kappa_max;
 };

@@ -19,6 +19,7 @@ public:
   virtual ~EntropyViscosityCoefficient();
 
 protected:
+  virtual void initQpStatefulProperties();  
   virtual void computeQpProperties();
 
   // Parameters
@@ -47,6 +48,7 @@ protected:
   const EquationOfState & _eos;
 
   // material to compute
+  MaterialProperty<Real> & _kappa_old;
   MaterialProperty<Real> & _kappa;
   MaterialProperty<Real> & _kappa_max;
   MaterialProperty<Real> & _residual;

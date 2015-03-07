@@ -7,7 +7,7 @@
   dim = 1
   xmin = 0.
   xmax = 100.
-  nx = 1000
+  nx = 400
 []
 
 [Functions]
@@ -94,16 +94,6 @@
     order = FIRST
   [../]
 
-  [./entropy_aux]
-    family = LAGRANGE
-    order = FIRST
-  [../]
-
-  [./F_aux]
-    family = LAGRANGE
-    order = FIRST
-  [../]
-
   [./kappa_aux]
     family = MONOMIAL
     order = CONSTANT
@@ -113,32 +103,12 @@
     family = MONOMIAL
     order = CONSTANT
   [../]
-  
-  [./residual_aux]
-    family = MONOMIAL
-    order = CONSTANT
-  [../]
 []
 
 [AuxKernels]
   [./u_ak]
     type = Xvelocity
     variable = u_aux
-    h = h
-    hu = hu
-  [../]
-
-  [./entropy_ak]
-    type = EnergySw
-    variable = entropy_aux
-    h = h
-    hu = hu
-  [../]
-
-  [./F_ak]
-    type = EnergyFluxSw
-    variable = F_aux
-    momentum = hu
     h = h
     hu = hu
   [../]
@@ -154,24 +124,16 @@
     variable = kappa_max_aux
     property = kappa_max
   [../]
- 
-  [./residual_ak]
-    type = MaterialRealAux
-    variable = residual_aux
-    property = residual
-  [../]
 []
 
 [Materials]
   [./EntropyViscosityCoeff]
-    type = EntropyViscosityCoefficient
+    type = LapidusViscosityCoefficient
     block = 0
-    is_first_order = false
-    Ce = 1.
+    Ce = 4.
     h = h
     hu = hu
-    entropy = entropy_aux
-    F = F_aux
+    u = u_aux    
     eos = hydro
   [../]
 []

@@ -39,6 +39,7 @@ public:
   virtual void initialize(){};
 
 protected:
+  std::string _var_name;  
 };
 
 

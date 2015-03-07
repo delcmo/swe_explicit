@@ -41,12 +41,23 @@ PressureBasedViscosityCoefficient::PressureBasedViscosityCoefficient(const std::
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Materials
+    _kappa_old(declarePropertyOld<Real>("kappa")),
     _kappa(declareProperty<Real>("kappa")),
     _kappa_max(declareProperty<Real>("kappa_max"))
 {}
 
 PressureBasedViscosityCoefficient::~PressureBasedViscosityCoefficient()
 {
+}
+
+void
+PressureBasedViscosityCoefficient::initQpStatefulProperties()
+{
+  // Cell size
+  Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
+
+  // Set value for the material
+  _kappa[_qp] = 0.5*h_cell;
 }
 
 void

@@ -33,7 +33,7 @@ ArtificialDissipativeFlux::ArtificialDissipativeFlux(const std::string & name,
     // Equation name
     _equ_type("continuity x_mom y_mom invalid", getParam<std::string>("equ_name")),
     // Material
-    _kappa(getMaterialProperty<Real>("kappa"))
+    _kappa(getMaterialPropertyOld<Real>("kappa"))
 {}
 
 Real ArtificialDissipativeFlux::computeQpResidual()

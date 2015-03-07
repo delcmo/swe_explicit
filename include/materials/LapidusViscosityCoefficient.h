@@ -19,6 +19,7 @@ public:
   virtual ~LapidusViscosityCoefficient();
 
 protected:
+  virtual void initQpStatefulProperties();   
   virtual void computeQpProperties();
 
   // Coupled variables
@@ -35,6 +36,7 @@ protected:
   const EquationOfState & _eos;
 
   // material to compute
+  MaterialProperty<Real> & _kappa_old;
   MaterialProperty<Real> & _kappa;
   MaterialProperty<Real> & _kappa_max;
 };

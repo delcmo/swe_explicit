@@ -25,7 +25,6 @@ Real
 WaterHeightEqu::computeQpResidual()
 {
   RealVectorValue conv(_hu[_qp], _hv[_qp], 0.);
-
   // return
   return -conv*_grad_test[_i][_qp];
 }

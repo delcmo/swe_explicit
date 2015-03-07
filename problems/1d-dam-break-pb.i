@@ -1,5 +1,6 @@
 [GlobalParams]
   implicit = false
+#  lumping = true
 []
 
 [Mesh]
@@ -7,7 +8,7 @@
   dim = 1
   xmin = 0.
   xmax = 100.
-  nx = 1000
+  nx = 500
 []
 
 [Functions]
@@ -23,6 +24,12 @@
   [./hydro]
     type = HydrostaticPressure
     gravity = 9.8
+  [../]
+  
+  [./jump]
+    type = JumpInterface
+    variable = F_aux
+    var_name = jump_aux
   [../]
 []
 
@@ -118,6 +125,11 @@
     family = MONOMIAL
     order = CONSTANT
   [../]
+  
+  [./jump_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
 []
 
 [AuxKernels]
@@ -166,7 +178,7 @@
   [./EntropyViscosityCoeff]
     type = EntropyViscosityCoefficient
     block = 0
-    is_first_order = false
+    is_first_order = true
     Ce = 1.
     h = h
     hu = hu
@@ -234,7 +246,7 @@
   nl_max_its = 10
 
   end_time = 4.
-#  num_steps = 1
+#  num_steps = 2
 
   [./Quadrature]
     type = GAUSS

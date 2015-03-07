@@ -32,6 +32,7 @@
 
 // userobjects
 #include "MaterialSmoothing.h"
+#include "JumpInterface.h"
 
 // materials
 #include "EntropyViscosityCoefficient.h"
@@ -112,6 +113,7 @@ SweExplicitApp::registerObjects(Factory & factory)
 
   // userobjects
   registerUserObject(MaterialSmoothing);
+  registerUserObject(JumpInterface);
 
   // materials
   registerMaterial(EntropyViscosityCoefficient);

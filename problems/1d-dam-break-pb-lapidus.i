@@ -24,6 +24,12 @@
     type = HydrostaticPressure
     gravity = 9.8
   [../]
+  
+  [./smooth]
+  type = MaterialSmoothing
+  variable = u_aux
+  var_name = grad_u_aux
+  [../]
 []
 
 [Variables]
@@ -100,6 +106,11 @@
   [../]
 
   [./kappa_max_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  
+  [./grad_u_aux]
     family = MONOMIAL
     order = CONSTANT
   [../]

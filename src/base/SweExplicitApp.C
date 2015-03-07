@@ -30,6 +30,9 @@
 #include "EquationOfState.h"
 #include "HydrostaticPressure.h"
 
+// userobjects
+#include "MaterialSmoothing.h"
+
 // materials
 #include "EntropyViscosityCoefficient.h"
 #include "LapidusViscosityCoefficient.h"
@@ -106,6 +109,9 @@ SweExplicitApp::registerObjects(Factory & factory)
   // eos
   registerUserObject(EquationOfState);
   registerUserObject(HydrostaticPressure);
+
+  // userobjects
+  registerUserObject(MaterialSmoothing);
 
   // materials
   registerMaterial(EntropyViscosityCoefficient);

@@ -226,7 +226,7 @@
   [./TimeStepper]
     type = PostprocessorDT
     postprocessor = dt
-    dt = 1.e-3
+    dt = 1.e-5
   [../]
 
   nl_rel_tol = 1e-12

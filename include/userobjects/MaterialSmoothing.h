@@ -1,7 +1,7 @@
 #ifndef MATERIALSMOOTHING_H
 #define MATERIALSMOOTHING_H
 
-#include "SideUserObject.h"
+#include "InternalSideUserObject.h"
 
 // Forward Declarations
 class MaterialSmoothing;
@@ -19,7 +19,7 @@ InputParameters validParams<MaterialSmoothing>();
  * We derive from UserObject so we can have a validParams()
  * function and be registered in the factory.
  */
-class MaterialSmoothing : public SideUserObject
+class MaterialSmoothing : public InternalSideUserObject
 {
 public:
   // Constructor
@@ -28,18 +28,24 @@ public:
   // Destructor
   virtual ~MaterialSmoothing();
 
-  /**
-   * Called when this object needs to compute something.
-   */
-  virtual void execute() {};
+  virtual void initialize();
+  virtual void execute();
+  virtual void destroy();
+  virtual void finalize();
+  virtual void threadJoin(const UserObject & uo);
 
-  /**
-   * Called before execute() is ever called so that data can be cleared.
-   */
-  virtual void initialize(){};
+  Real getValue() const { return _value; }  
 
 protected:
-  std::string _var_name;  
+  // Auxiliary system variable:
+  AuxiliarySystem & _aux;
+  // Gradient value:
+  VariableGradient & _grad_u;
+  VariableGradient & _grad_u_neighbor;
+  // Name of the variable storing the jump:
+  std::string _var_name;
+  // Temporary variable:
+  Real _value;
 };
 
 

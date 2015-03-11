@@ -25,6 +25,8 @@ TimeStepCFL::TimeStepCFL(const std::string & name, InputParameters parameters) :
     _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
+    // Viscous coefficient
+    _kappa(getMaterialProperty<Real>("kappa")),
     // Parameters
     _cfl(getParam<Real>("cfl")),
     _value(0.)
@@ -53,9 +55,12 @@ TimeStepCFL::execute()
     // Compute local max eigenvalue
     RealVectorValue hU(_hu[qp], _hv[qp], 0.);
     Real eigen = hU.size()/_h[qp]+std::sqrt(_eos.c2(_h[qp], hU));
+    Real dt_hyp = _cfl * h_cell / eigen;
+    Real dt_diff = 2. * _cfl * h_cell * h_cell / _kappa[qp];
+    Real dt = std::min(dt_hyp, dt_diff);
 
     // Compute the local time step
-    _value = std::min(_value, _cfl * h_cell / eigen);
+    _value = std::min(_value, dt);
   }
 }
 

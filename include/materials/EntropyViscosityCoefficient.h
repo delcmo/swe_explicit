@@ -25,6 +25,7 @@ protected:
   // Parameters
   bool _is_first_order;
   Real _Ce;
+  Real _Cmax;
   Real _g;
 
   // Coupled variables

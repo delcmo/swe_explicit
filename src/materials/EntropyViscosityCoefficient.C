@@ -8,6 +8,7 @@ InputParameters validParams<EntropyViscosityCoefficient>()
   // Parameters
   params.addParam<bool>("is_first_order", false, "if true, use the first-order viscosity coefficient");
   params.addParam<Real>("Ce", 1., "coefficient for high-order viscosity coefficient");
+  params.addParam<Real>("Cmax", 0.5, "coefficient for first-order viscosity coefficient");
   params.addParam<Real>("gravity", 9.81, "gravity");
   // Coupled variables
   params.addRequiredCoupledVar("h", "high/density");
@@ -29,6 +30,7 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     // Parameters
     _is_first_order(getParam<bool>("is_first_order")),
     _Ce(getParam<Real>("Ce")),
+    _Cmax(getParam<Real>("Cmax")),
     _g(getParam<Real>("gravity")),
     // Coupled variables
     _h(coupledValue("h")),
@@ -63,7 +65,7 @@ EntropyViscosityCoefficient::initQpStatefulProperties()
   Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
 
   // Set value for the material
-  _kappa[_qp] = 0.5*h_cell;
+  _kappa[_qp] = _Cmax*h_cell;
 }
 
 void
@@ -79,7 +81,7 @@ EntropyViscosityCoefficient::computeQpProperties()
   Real c2 = _eos.c2(_h[_qp], hU);
 
   // First-order viscosity coefficient
-  _kappa_max[_qp] = 0.5*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
+  _kappa_max[_qp] = _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
 
   // Weights for BDF2
   Real w0 = _t_step > 1 ? (2.*_dt+_dt_old)/(_dt*(_dt+_dt_old)) : 1. / _dt;

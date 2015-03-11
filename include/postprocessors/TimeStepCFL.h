@@ -35,6 +35,9 @@ protected:
   // Equation of state
   const EquationOfState & _eos;
 
+  // Materials
+  MaterialProperty<Real> & _kappa;
+
   // Parameter
   Real _cfl;
   Real _value;

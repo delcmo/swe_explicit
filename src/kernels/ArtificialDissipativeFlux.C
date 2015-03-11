@@ -38,6 +38,7 @@ ArtificialDissipativeFlux::ArtificialDissipativeFlux(const std::string & name,
 
 Real ArtificialDissipativeFlux::computeQpResidual()
 {
+
   switch (_equ_type)
   {
     case continuity:

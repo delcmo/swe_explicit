@@ -1,23 +1,24 @@
 [GlobalParams]
   implicit = false
-#  lumping = false
-  Cmax = 1.
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 1
-  xmin = 0.
-  xmax = 100.
   nx = 400
 []
 
 [Functions]
+  [./topology]
+    type = ConstantFunction
+    value = 0.
+  [../]
+
   [./ic_func]
     axis = 0
     type = PiecewiseLinear
-    x = '0  50  50.1 100'
-    y = '10 10  0.5  0.5'
+    x = '0  0.5  0.5001  1'
+    y = '1  1    0.5     0.5'
   [../]
 []
 
@@ -25,12 +26,6 @@
   [./hydro]
     type = HydrostaticPressure
     gravity = 9.8
-  [../]
-  
-  [./jump]
-    type = JumpInterface
-    variable = F_aux
-    var_name = jump_aux
   [../]
 []
 
@@ -52,25 +47,28 @@
       value = 0.
     [../]
   [../]
+  
+  [./p_laplace]
+    family = LAGRANGE
+    order = FIRST  
+    [./InitialCondition]
+      type = ConstantIC
+      value = 0.
+    [../]
+  [../]
 []
 
 [Kernels]
   [./TimeMass]
     type = TimeDerivative
     variable = h
-    implicit = true    
+    implicit = true
   [../]
 
   [./Mass]
     type = WaterHeightEqu
     variable = h
     hu = hu
-  [../]
-
-  [./ArtDiffMass]
-    type = ArtificialDissipativeFlux
-    variable = h
-    equ_name = continuity
   [../]
 
   [./TimeMmom]
@@ -89,10 +87,28 @@
     eos = hydro
   [../]
   
+  [./ArtDiffMass]
+    type = ArtificialDissipativeFlux
+    variable = h
+    equ_name = continuity
+  [../]
+  
   [./ArtDiffMom]
     type = ArtificialDissipativeFlux
     variable = hu
     equ_name = x_mom
+  [../]
+  
+  [./PressMassMatrix]
+    type = PressureBasedViscosityMassMatrix
+    variable = p_laplace
+    implicit = true
+  [../]
+  
+  [./PressLaplace]
+    type = PressureBasedViscosityLaplace
+    variable = p_laplace
+    pressure = p_aux
   [../]
 []
 
@@ -101,13 +117,8 @@
     family = LAGRANGE
     order = FIRST
   [../]
-
-  [./entropy_aux]
-    family = LAGRANGE
-    order = FIRST
-  [../]
-
-  [./F_aux]
+  
+  [./p_aux]
     family = LAGRANGE
     order = FIRST
   [../]
@@ -121,16 +132,6 @@
     family = MONOMIAL
     order = CONSTANT
   [../]
-  
-  [./residual_aux]
-    family = MONOMIAL
-    order = CONSTANT
-  [../]
-  
-  [./jump_aux]
-    family = MONOMIAL
-    order = CONSTANT
-  [../]
 []
 
 [AuxKernels]
@@ -140,20 +141,13 @@
     h = h
     hu = hu
   [../]
-
-  [./entropy_ak]
-    type = EnergySw
-    variable = entropy_aux
+  
+  [./p_ak]
+    type = PressureSw
+    variable = p_aux
     h = h
     hu = hu
-  [../]
-
-  [./F_ak]
-    type = EnergyFluxSw
-    variable = F_aux
-    momentum = hu
-    h = h
-    hu = hu
+    eos = hydro
   [../]
 
   [./kappa_ak]
@@ -167,25 +161,20 @@
     variable = kappa_max_aux
     property = kappa_max
   [../]
- 
-  [./residual_ak]
-    type = MaterialRealAux
-    variable = residual_aux
-    property = residual
-  [../]
 []
 
 [Materials]
-  [./EntropyViscosityCoeff]
-    type = EntropyViscosityCoefficient
+  [./LapidusViscosityCoeff]
+    type = PressureBasedViscosityCoefficient
     block = 0
-    is_first_order = true
-    Ce = 1.
     h = h
     hu = hu
-    entropy = entropy_aux
-    F = F_aux
+    norm_velocity = u_aux
+    press_laplace = p_laplace
+    pressure = p_aux
+    pressure_based_visc_type = ST
     eos = hydro
+    Ce = 1.2
   [../]
 []
 
@@ -194,7 +183,7 @@
     type = DirichletBC
     variable = h
     boundary = left
-    value = 10.
+    value = 1.
   [../]
 
   [./right_h]
@@ -230,29 +219,32 @@
   [../]
 []
 
+[Preconditioning]
+  [./FDP]
+    type = FDP
+    full = true
+    solve_type = 'PJFNK'
+  [../]
+[]
+
 [Executioner]
   type = Transient
-  scheme = 'rk-2'
+  scheme = 'explicit-euler'
 
-  dt = 1.e-2
-  
-  [./TimeStepper]
-    type = PostprocessorDT
-    postprocessor = dt
-    dt = 1.e-5
-  [../]
+ dt = 1.e-2
+
+ [./TimeStepper]
+   type = PostprocessorDT
+   postprocessor = dt
+   dt = 1.e-5
+ [../]
 
   nl_rel_tol = 1e-12
   nl_abs_tol = 1e-6
   nl_max_its = 10
 
   end_time = 4.
-#  num_steps = 1
-
-  [./Quadrature]
-   type = GAUSS # TRAP
-    order = SECOND
-  [../]
+#  num_steps = 10
 
 []
 
@@ -262,3 +254,8 @@
   print_linear_residuals = false
   print_perf_log = true
 []
+
+#[Debug]
+#  show_var_residual = 'h hu'
+#  show_var_residual_norms = true
+#[]

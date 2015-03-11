@@ -47,18 +47,18 @@ SaintVenantSetWaterHeightOutletBC::computeQpResidual()
 {
   // Check that the bc is an inlet bc
   Real vel = _hu[_qp]/_h[_qp];
-  if (vel*_normals[_qp](0)<0)
-    mooseError("'" << this->name() << "' is not/no longer an outlet bc: 'vec{u} dot vec{normal}' is negative");
+//  if (vel*_normals[_qp](0)<0)
+//    mooseError("'" << this->name() << "' is not/no longer an outlet bc: 'vec{u} dot vec{normal}' is negative");
 
   // Current bc values of the momentum, sound speed and pressure
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real c2 = _eos.c2(_h[_qp], hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
 
   // Compute bc pressure and water height
   Real p_bc = _eos.pressure(_h_bc, hU);
   Real h_bc = _h_bc;
-  if (Mach>1)
+  if (Froude>1)
   {
     p_bc = _eos.pressure(_h[_qp], hU);
     h_bc = _h[_qp];
@@ -85,9 +85,9 @@ SaintVenantSetWaterHeightOutletBC::computeQpJacobian()
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real vel = _hu[_qp]/_h[_qp];  
   Real c2 = _eos.c2(_h[_qp], hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
   Real h_bc = _h_bc;
-  if (Mach>1)
+  if (Froude>1)
     h_bc = _h[_qp];
 
   // Return the value of the bc flux for each equation
@@ -108,12 +108,12 @@ SaintVenantSetWaterHeightOutletBC::computeQpOffDiagJacobian(unsigned jvar)
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real vel = _hu[_qp]/_h[_qp];
   Real c2 = _eos.c2(_h[_qp], hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
   Real h_bc = _h_bc;
-  if (Mach>1)
+  if (Froude>1)
     h_bc = _h[_qp];
 
-  if (jvar == _h_var && Mach>1)
+  if (jvar == _h_var && Froude>1)
   {
     switch (_equ_type)
     {

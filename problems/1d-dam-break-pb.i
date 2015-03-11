@@ -1,7 +1,6 @@
 [GlobalParams]
   implicit = false
 #  lumping = false
-  Cmax = 1.
 []
 
 [Mesh]
@@ -9,7 +8,7 @@
   dim = 1
   xmin = 0.
   xmax = 100.
-  nx = 400
+  nx = 200
 []
 
 [Functions]
@@ -190,32 +189,75 @@
 []
 
 [BCs]
-  [./left_h]
-    type = DirichletBC
+ active='h_bc_wall hu_bc_wall'
+  [./h_bc_left]
+    type = SaintVenantSetWaterHeightOutletBC
     variable = h
     boundary = left
-    value = 10.
+    equ_name = continuity
+    h = h
+    hu = hu
+    h_bc = 10.
+    eos = hydro
+    implicit = true 
   [../]
 
-  [./right_h]
-    type = DirichletBC
+  [./h_bc_right]
+    type = SaintVenantSetWaterHeightOutletBC
     variable = h
     boundary = right
-    value = 0.5
+    equ_name = continuity
+    h = h
+    hu = hu
+    h_bc = 0.5
+    eos = hydro
+    implicit = true
   [../]
 
-  [./left_hu]
-    type = DirichletBC
+  [./hu_bc_left]
+    type = SaintVenantSetWaterHeightOutletBC
     variable = hu
     boundary = left
-    value = 0.
+    equ_name = x_mom
+    h = h
+    hu = hu
+    h_bc = 10.
+    eos = hydro
+    implicit = true
   [../]
 
-  [./right_hu]
-    type = DirichletBC
+  [./hu_bc_right]
+    type = SaintVenantSetWaterHeightOutletBC
     variable = hu
     boundary = right
-    value = 0.
+    equ_name = x_mom
+    h = h
+    hu = hu
+    h_bc = 0.5
+    eos = hydro
+    implicit = true
+  [../]
+
+  [./h_bc_wall]
+    type = SolidWallBC
+    variable = h
+    boundary = 'right left'
+    equ_name = continuity
+    h = h
+    hu = hu
+    eos = hydro
+    implicit = true
+  [../]
+
+  [./hu_bc_wall]
+    type = SolidWallBC
+    variable = hu
+    boundary = 'right left'
+    equ_name = x_mom
+    h = h
+    hu = hu
+    eos = hydro
+    implicit = true
   [../]
 []
 
@@ -225,14 +267,14 @@
     h = h
     hu = hu
     eos = hydro
-    cfl = 0.1
+    cfl = 0.2
     outputs = none
   [../]
 []
 
 [Executioner]
   type = Transient
-  scheme = 'rk-2'
+  scheme = 'implicit-euler' # 'rk-2'
 
   dt = 1.e-2
   
@@ -246,11 +288,11 @@
   nl_abs_tol = 1e-6
   nl_max_its = 10
 
-  end_time = 4.
+  end_time = 500.
 #  num_steps = 1
 
   [./Quadrature]
-   type = GAUSS # TRAP
+   type = TRAP
     order = SECOND
   [../]
 
@@ -261,4 +303,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
+  interval = 100
 []

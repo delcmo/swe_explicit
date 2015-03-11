@@ -49,16 +49,16 @@ SaintVenantSetWaterHeightInletBC::computeQpResidual()
 {
   // Check that the bc is an inlet bc
   Real vel = _hu[_qp]/_h_bc;
-  if (vel*_normals[_qp](0)>0)
-    mooseError("'" << this->name() << "' is not/no longer an inlet bc: 'vec{u} dot vec{normal}' is greater than zero");
+//  if (vel*_normals[_qp](0)>0)
+//    mooseError("'" << this->name() << "' is not/no longer an inlet bc: 'vec{u} dot vec{normal}' is greater than zero");
 
   // Current bc values of the momentum, sound speed and pressure
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real c2 = _eos.c2(_h_bc, hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
 
   // If the fluid is supersonic u_bc is used to evaluate hU at the boundary
-  if (Mach>1)
+  if (Froude>1)
   {
     if (!_u_bc_specified)
       mooseError("'" << this->name() << "': the fluid becomes supersonic but you did not sepcify an inlet fluid velocity value in the input file.");
@@ -87,11 +87,11 @@ SaintVenantSetWaterHeightInletBC::computeQpJacobian()
   Real vel = _hu[_qp]/_h_bc;
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real c2 = _eos.c2(_h_bc, hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
   Real dpdu;
 
   // Return jacobian terms
-  if (Mach<1)
+  if (Froude<1)
   {
     switch (_equ_type)
     {
@@ -114,10 +114,10 @@ SaintVenantSetWaterHeightInletBC::computeQpOffDiagJacobian(unsigned jvar)
   Real vel = _hu[_qp]/_h_bc;
   RealVectorValue hU(_hu[_qp], 0., 0.);
   Real c2 = _eos.c2(_h_bc, hU);
-  Real Mach = std::fabs(vel)/std::sqrt(c2);
+  Real Froude = std::fabs(vel)/std::sqrt(c2);
 
   // Non-zero jacobian term only if subsonic fluid
-  if (jvar == _hu_var && Mach < 1)
+  if (jvar == _hu_var && Froude < 1)
   {
     switch (_equ_type)
     {

@@ -57,7 +57,7 @@ Real ArtificialDissipativeFlux::computeQpResidual()
 
 Real ArtificialDissipativeFlux::computeQpJacobian()
 {
-  return _kappa[_qp]*_grad_phi[_j][_qp]*_grad_test[_i][_qp];
+  return 0.;
 }
 
 Real ArtificialDissipativeFlux::computeQpOffDiagJacobian( unsigned int _jvar)

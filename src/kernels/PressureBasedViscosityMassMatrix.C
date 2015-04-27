@@ -35,5 +35,5 @@ PressureBasedViscosityMassMatrix::computeQpResidual()
 Real
 PressureBasedViscosityMassMatrix::computeQpJacobian()
 {
-    return _test[_j][_qp] * _test[_i][_qp];
+  return 0.;
 }

@@ -39,7 +39,7 @@ Real PressureBasedViscosityLaplace::computeQpResidual()
 
 Real PressureBasedViscosityLaplace::computeQpJacobian()
 {
-  return _grad_phi[_j][_qp]*_grad_test[_i][_qp];
+  return 0.;
 }
 
 Real PressureBasedViscosityLaplace::computeQpOffDiagJacobian( unsigned int _jvar)

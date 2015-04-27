@@ -61,86 +61,11 @@ MomentumEqu::computeQpResidual()
 Real
 MomentumEqu::computeQpJacobian()
 {
-  // Pressure
-  RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
-  Real dpdu = _phi[_j][_qp]*_grad_test[_i][_qp](_component);
-  if (_component == 0)
-    dpdu *= _eos.dp_dhu(_h[_qp], hU);
-  else if (_component == 1)
-    dpdu *= _eos.dp_dhv(_h[_qp], hU);
-  else
-    mooseError("'" << this->name() << "' can only be used with 1 and 2-D mesh.");
-
-  // Advection
-  hU(_component) *= 2.;
-  Real dadvcdu = _phi[_j][_qp]/_h[_qp]*(hU*_grad_test[_i][_qp]);
-
-  // Topology
-  Real dtplg_grad_du= 0.;
-
-  // return value
-  return -dadvcdu-dpdu+dtplg_grad_du;
+  return 0.;
 }
 
 Real
 MomentumEqu::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _h_var) // water height 'h'
-  {
-    RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);    
-    // Pressure
-    Real dpdh = _phi[_j][_qp]*_grad_test[_i][_qp](_component);
-    dpdh *= _eos.dp_dh(_h[_qp], hU);
-
-    // Advection
-    Real dadvcdh = -_u[_qp]/(_h[_qp]*_h[_qp])*(hU*_grad_test[_i][_qp]);
-    dadvcdh *= _phi[_j][_qp];
-
-    // Topology
-    Real dtplg_grad_dh = _phi[_j][_qp]*_g*_b_grad[_qp](_component)*_test[_i][_qp];
-
-    // return value
-    return -dadvcdh-dpdh+dtplg_grad_dh;
-  }
-  else if (jvar == _hu_var && _component == 1) // x-component of momentum vector 'hu'
-  {
-    RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
-    // Pressure
-    Real dpdhu = _phi[_j][_qp]*_grad_test[_i][_qp](_component);
-    dpdhu *= _eos.dp_dhu(_h[_qp], hU);
-
-    // Advection
-    hU(0) = 1.;
-    hU(1) = 0.;
-    Real dadvcdhu = _u[_qp]/_h[_qp]*(hU*_grad_test[_i][_qp]);
-    dadvcdhu *= _phi[_j][_qp];
-
-    // Topology
-    Real dtplg_grad_dhu=0.;
-
-    // return value
-    return -dadvcdhu-dpdhu+dtplg_grad_dhu;
-  }
-  else if (jvar == _hv_var && _component == 0) // y-component of momentum vector 'hv'
-  {
-    RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);    
-    // Pressure
-    Real dpdhv = _phi[_j][_qp]*_grad_test[_i][_qp](_component);
-    dpdhv *= _eos.dp_dhv(_h[_qp], hU);
-
-    // Advection
-    hU(0) = 0.;
-    hU(1) = 1.;
-    Real dadvcdhv = _u[_qp]/_h[_qp]*(hU*_grad_test[_i][_qp]);
-    dadvcdhv *= _phi[_j][_qp];
-
-    // Topology
-    Real dtplg_grad_dhv=0.;
-
-    // return value
-    return -dadvcdhv-dpdhv+dtplg_grad_dhv;
-  }
-  else
-    return 0.;
-    
+  return 0.;
 }

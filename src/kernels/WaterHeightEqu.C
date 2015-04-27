@@ -38,14 +38,5 @@ WaterHeightEqu::computeQpJacobian()
 Real
 WaterHeightEqu::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar==_hu_var)
-  {
-    return -_phi[_j][_qp]*_grad_test[_i][_qp](0);
-  }
-  else if (jvar==_hv_var)
-  {
-    return -_phi[_j][_qp]*_grad_test[_i][_qp](1);
-  }
-  else
-    return 0.;
+  return 0.;
 }

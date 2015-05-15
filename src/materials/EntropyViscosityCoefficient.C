@@ -18,7 +18,10 @@ InputParameters validParams<EntropyViscosityCoefficient>()
   params.addRequiredCoupledVar("entropy", "entropy function");
   params.addRequiredCoupledVar("F", "x-component of the entropy flux ");
   params.addCoupledVar("G", "y-component of the entropy flux ");
-  params.addCoupledVar("b", "topology");  
+  params.addCoupledVar("b", "topology");
+  // Coupled variables: jump
+  params.addCoupledVar("jump_entropy_flux_x", "Jump of the x-componenet of the entropy flux");
+  params.addCoupledVar("jump_entropy_flux_y", "Jump of the y-componenet of the entropy flux");  
   // Equation of state
   params.addRequiredParam<UserObjectName>("eos", "Equation of state");
 
@@ -45,6 +48,9 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     _G_grad(_mesh.dimension() == 2 ? coupledGradient("G") : _grad_zero),
     // Coupled aux variables: topology
     _b(isCoupled("b") ? coupledValue("b") : _zero),
+    // Jump of the flux
+    _jump_x(isCoupled("jump_entropy_flux_x") ? coupledValue("jump_entropy_flux_x") : _zero),
+    _jump_y(isCoupled("jump_entropy_flux_y") ? coupledValue("jump_entropy_flux_y") : _zero),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Materials
@@ -99,8 +105,11 @@ EntropyViscosityCoefficient::computeQpProperties()
   // Normalization parameter
   Real norm = _g*(_h[_qp]+_b[_qp]+1.e-6);
 
+  // Compute the jump
+  Real jump = std::max(_jump_x[_qp], _jump_y[_qp]);
+
   // High-order viscosity coefficient
-  Real kappa = _t_step == 1 ? _kappa_max[_qp] : _Ce*h_cell*h_cell*std::fabs(residual/norm);
+  Real kappa = _t_step == 1 ? _kappa_max[_qp] : _Ce*h_cell*h_cell*std::fabs(std::max(residual, jump)/norm);
 
   // Return value of the viscosity coefficient
   _kappa[_qp] = _is_first_order ? _kappa_max[_qp] : std::min(kappa, _kappa_max[_qp]);

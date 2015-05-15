@@ -45,6 +45,10 @@ protected:
   // COupled aux variables: topology
   VariableValue & _b;
 
+  // Coupled variables: jumps
+  VariableValue & _jump_x;
+  VariableValue & _jump_y;
+
   // Equation of state
   const EquationOfState & _eos;
 

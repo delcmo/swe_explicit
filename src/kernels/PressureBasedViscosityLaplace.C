@@ -29,7 +29,7 @@ InputParameters validParams<PressureBasedViscosityLaplace>()
 PressureBasedViscosityLaplace::PressureBasedViscosityLaplace(const std::string & name,
                        InputParameters parameters) :
   Kernel(name, parameters),
-    _press_grad(coupledGradientOld("pressure"))
+    _press_grad(_is_implicit ? coupledGradient("pressure") : coupledGradientOld("pressure"))
 {}
 
 Real PressureBasedViscosityLaplace::computeQpResidual()

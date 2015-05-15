@@ -1,6 +1,6 @@
 [GlobalParams]
   implicit = false
-#  lumping = false
+  lumping = true
 []
 
 [Mesh]
@@ -275,6 +275,7 @@
 [Executioner]
   type = Transient
   scheme = 'implicit-euler' # 'rk-2'
+  solve_type = 'LINEAR'
 
   dt = 1.e-2
   
@@ -288,11 +289,11 @@
   nl_abs_tol = 1e-6
   nl_max_its = 10
 
-  end_time = 500.
+  end_time = 3.
 #  num_steps = 1
 
   [./Quadrature]
-   type = TRAP
+   type = GAUSS
     order = SECOND
   [../]
 
@@ -303,5 +304,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 100
+  interval = 10
 []

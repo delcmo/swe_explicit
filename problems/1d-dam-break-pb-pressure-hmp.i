@@ -1,5 +1,4 @@
 [GlobalParams]
-  implicit = false
 []
 
 [Mesh]
@@ -82,21 +81,23 @@
     variable = hu
     h = h
     hu = hu
-    gravity = 9.8
     component = 0
     eos = hydro
+    implicit = false
   [../]
   
   [./ArtDiffMass]
     type = ArtificialDissipativeFlux
     variable = h
     equ_name = continuity
+    implicit = false
   [../]
   
   [./ArtDiffMom]
     type = ArtificialDissipativeFlux
     variable = hu
     equ_name = x_mom
+    implicit = false
   [../]
   
   [./PressMassMatrix]
@@ -109,6 +110,7 @@
     type = PressureBasedViscosityLaplace
     variable = p_laplace
     pressure = p_aux
+    implicit = false
   [../]
 []
 

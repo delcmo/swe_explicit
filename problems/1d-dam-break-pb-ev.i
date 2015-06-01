@@ -279,8 +279,6 @@
   type = Transient
   scheme = 'explicit-euler' # 'rk-2'
   solve_type = 'JFNK'
-
-  dt = 1.e-2
   
   [./TimeStepper]
     type = PostprocessorDT
@@ -307,5 +305,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 20
+  interval = 1
 []

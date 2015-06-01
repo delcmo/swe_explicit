@@ -4,6 +4,7 @@
 #include "ModulesApp.h"
 
 // kernels
+#include "LumpedTimeDerivative.h"
 #include "WaterHeightEqu.h"
 #include "MomentumEqu.h"
 #include "ArtificialDissipativeFlux.h"
@@ -88,6 +89,7 @@ void
 SweExplicitApp::registerObjects(Factory & factory)
 {
   // kernels
+  registerKernel(LumpedTimeDerivative);
   registerKernel(WaterHeightEqu);
   registerKernel(MomentumEqu);
   registerKernel(ArtificialDissipativeFlux);

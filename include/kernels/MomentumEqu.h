@@ -27,7 +27,6 @@ protected:
 
   VariableGradient & _b_grad;
 
-  Real _g;
   unsigned int _component;
 
   const EquationOfState & _eos;

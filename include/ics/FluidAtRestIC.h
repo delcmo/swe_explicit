@@ -12,33 +12,37 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ENERGYSW_H
-#define ENERGYSW_H
+#ifndef FLUIDATRESTIC_H
+#define FLUIDATRESTIC_H
 
-#include "AuxKernel.h"
-#include "EquationOfState.h"
+// MOOSE Includes
+#include "InitialCondition.h"
+#include "Function.h"
 
-class EnergySw;
+// Forward Declarations
+class FluidAtRestIC;
 
 template<>
-InputParameters validParams<EnergySw>();
+InputParameters validParams<FluidAtRestIC>();
 
-class EnergySw : public AuxKernel
+class FluidAtRestIC : public InitialCondition
 {
 public:
 
-  EnergySw(const std::string & name, InputParameters parameters);
+  FluidAtRestIC(const std::string & name,
+            InputParameters parameters);
 
-protected:
-  virtual Real computeValue();
+  virtual Real value(const Point & p);
 
-  // Coupled variables
-  VariableValue & _h;
-  VariableValue & _hu;
-  VariableValue & _hv;
+private:
+  // Maximum water high
+  Real _H;
 
-  // Equation of state:
-  const EquationOfState & _eos;
+  // Initial value of the fluid velocity
+  Real _vel;
+
+  // Function computing the topology
+  Function & _func;  
 };
 
-#endif //ENERGYSW_H
+#endif // FLUIDATRESTIC_H

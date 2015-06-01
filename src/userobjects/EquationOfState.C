@@ -52,6 +52,14 @@ EquationOfState::c2(Real, RealVectorValue) const
   return 0.;
 }
 
+// Gravity
+Real
+EquationOfState::gravity() const
+{
+  this->error_not_implemented("gravity");
+  return 0.;
+}
+
 void EquationOfState::error_not_implemented(std::string method_name) const
 {
   mooseError("Your EquationOfState object does not implement: " + method_name);

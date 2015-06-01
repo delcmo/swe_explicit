@@ -25,8 +25,8 @@ InputParameters validParams<EnergySw>()
   params.addRequiredCoupledVar("h", "water height");
   params.addRequiredCoupledVar("hu", "x component of h*vec{u}");
   params.addCoupledVar("hv", "y component of h*vec{u}");
-  // Gravity
-  params.addParam<Real>("gravity", 9.81, "value of the gravity");
+  // Equation of state
+  params.addRequiredParam<UserObjectName>("eos", "Equation of state");
 
   return params;
 }
@@ -37,13 +37,13 @@ EnergySw::EnergySw(const std::string & name, InputParameters parameters) :
     _h(coupledValue("h")),
     _hu(coupledValue("hu")),
     _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
-    // Gravity:
-    _g(getParam<Real>("gravity"))
+    // Equation of state:
+    _eos(getUserObject<EquationOfState>("eos"))
 {}
 
 Real
 EnergySw::computeValue()
 {
   RealVectorValue U(_hu[_qp]/_h[_qp], _hv[_qp]/_h[_qp], 0.);
-  return 0.5*_h[_qp]*(_g*_h[_qp]+U.size_sq());
+  return 0.5*_h[_qp]*(_eos.gravity()*_h[_qp]+U.size_sq());
 }

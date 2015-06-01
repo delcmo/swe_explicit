@@ -16,6 +16,7 @@
 #define ENERGYFLUXSW_H
 
 #include "AuxKernel.h"
+#include "EquationOfState.h"
 
 class EnergyFluxSw;
 
@@ -42,8 +43,8 @@ protected:
   // Coupled aux variables
   VariableValue & _b;
 
-  // Gravity
-  Real _g;
+  // Equation of state:
+  const EquationOfState & _eos;
 };
 
 #endif //ENERGYFLUXSW_H

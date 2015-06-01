@@ -34,8 +34,7 @@ LapidusViscosityCoefficient::LapidusViscosityCoefficient(const std::string & nam
     _kappa(declareProperty<Real>("kappa")),
     _kappa_max(declareProperty<Real>("kappa_max"))
 {
-  if (_mesh.dimension()!=1)
-    mooseError("'" << this->name() << "' can only be used with 1-D mesh.");
+  mooseAssert(_mesh.dimension()!=1, "'" << this->name() << "' can only be used with 1-D mesh.");
 }
 
 LapidusViscosityCoefficient::~LapidusViscosityCoefficient()

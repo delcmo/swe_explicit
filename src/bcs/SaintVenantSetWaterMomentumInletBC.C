@@ -1,10 +1,10 @@
-#include "SaintVenantSetWaterVelocityInletBC.h"
+#include "SaintVenantSetWaterMomentumInletBC.h"
 #include "EquationOfState.h"
 
 /** Set the fluid velocity at the boundary **/
 
 template<>
-InputParameters validParams<SaintVenantSetWaterVelocityInletBC>()
+InputParameters validParams<SaintVenantSetWaterMomentumInletBC>()
 {
   InputParameters params = validParams<IntegratedBC>();
 
@@ -14,8 +14,8 @@ InputParameters validParams<SaintVenantSetWaterVelocityInletBC>()
   params.addRequiredCoupledVar("h", "water height");
   params.addRequiredCoupledVar("hu", "x-mom of h*vec{u}");  
   // Constants and parameters
-  params.addRequiredParam<Real>("u_bc", "boundary value of the velocity");
-  params.addParam<Real>("h_bc", "boundary value of the water height (only used if fluid becomes supersonic at the inlet.");  
+  params.addParam<Real>("h_bc", "boundary value of the water height (only used if fluid becomes supersonic at the inlet).");
+  params.addRequiredParam<Real>("hu_bc", "boundary value of the water momentum.");
   // Equation of state
   params.addRequiredParam<UserObjectName>("eos", "The name of equation of state object to use.");
 
@@ -23,7 +23,7 @@ InputParameters validParams<SaintVenantSetWaterVelocityInletBC>()
 }
 
 
-SaintVenantSetWaterVelocityInletBC::SaintVenantSetWaterVelocityInletBC(const std::string & name, InputParameters parameters) :
+SaintVenantSetWaterMomentumInletBC::SaintVenantSetWaterMomentumInletBC(const std::string & name, InputParameters parameters) :
     IntegratedBC(name, parameters),
     // Equation name
     _equ_type("continuity x_mom invalid", getParam<std::string>("equ_name")),
@@ -31,8 +31,8 @@ SaintVenantSetWaterVelocityInletBC::SaintVenantSetWaterVelocityInletBC(const std
     _h(coupledValue("h")),
     _hu(coupledValue("hu")),
     // Constants and parameters
-    _u_bc(getParam<Real>("u_bc")),
     _h_bc(isCoupled("h_bc") ? getParam<Real>("h_bc") : 0.),
+    _hu_bc(getParam<Real>("hu_bc")),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Integer for jacobian terms
@@ -47,37 +47,35 @@ SaintVenantSetWaterVelocityInletBC::SaintVenantSetWaterVelocityInletBC(const std
 }
 
 Real
-SaintVenantSetWaterVelocityInletBC::computeQpResidual()
+SaintVenantSetWaterMomentumInletBC::computeQpResidual()
 {
   // Check that the bc is an inlet bc
-  if (_hu[_qp]/_h[_qp]*_normals[_qp](0)>0)
-    mooseError("'" << this->name() << "' is not/no longer an inlet bc: 'vec{u} dot vec{normal}' is greater than zero");
+  mooseAssert(_hu[_qp]/_h[_qp]*_normals[_qp](0)>0, "'" << this->name() << "' is not/no longer an inlet bc: 'vec{u} dot vec{normal}' is greater than zero");
 
-  // Current bc values of the momentum, sound speed and pressure
-  RealVectorValue hU(_h[_qp]*_u_bc, 0., 0.);
-  Real c2 = _eos.c2(_h[_qp], hU);
-  Real Fr = std::fabs(_u_bc)/std::sqrt(c2);
-  Real p_bc = _eos.pressure(_h[_qp], hU);
+  // Current bc values of the momentum, sound speed
+  RealVectorValue hU_bc(_hu_bc, 0., 0.);
+  Real c2 = _eos.c2(_h[_qp], hU_bc);
+  Real Fr = std::fabs(_hu_bc/_h[_qp])/std::sqrt(c2);
   Real h_bc = _h[_qp];
 
   // If the fluid is supersonic u_bc and h_bc are used to compute hU at the boundary
   if (Fr>1)
   {
-    if (!_h_bc_specified)
-      mooseError("'" << this->name() << "': the fluid becomes supersonic but you did not sepcify an inlet water height value in the input file.");
-    hU(0) = _h_bc*_u_bc;
-    p_bc = _eos.pressure(_h_bc, hU);
+    mooseAssert(!_h_bc_specified, "'" << this->name() << "': the fluid becomes supersonic but you did not sepcify an inlet water height value in the input file.");
     h_bc = _h_bc;
   }
+
+  // Compute the pressure
+  Real p_bc = _eos.pressure(h_bc, hU_bc);
 
   // Return flux
   switch (_equ_type)
   {
     case continuity:
-      return h_bc*_u_bc*_normals[_qp](0)*_test[_i][_qp];
+      return _hu_bc*_normals[_qp](0)*_test[_i][_qp];
       break;
     case x_mom:
-      return (_u_bc*_u_bc*h_bc+p_bc)*_normals[_qp](0)*_test[_i][_qp];
+      return (_hu_bc*_hu_bc/h_bc+p_bc)*_normals[_qp](0)*_test[_i][_qp];
       break;
     default:
       mooseError("'" << this->name() << "' Invalid equation name.");
@@ -85,13 +83,13 @@ SaintVenantSetWaterVelocityInletBC::computeQpResidual()
 }
 
 Real
-SaintVenantSetWaterVelocityInletBC::computeQpJacobian()
+SaintVenantSetWaterMomentumInletBC::computeQpJacobian()
 {
   return 0.;
 }
 
 Real
-SaintVenantSetWaterVelocityInletBC::computeQpOffDiagJacobian(unsigned jvar)
+SaintVenantSetWaterMomentumInletBC::computeQpOffDiagJacobian(unsigned jvar)
 {
   return 0.;
 }

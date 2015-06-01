@@ -18,12 +18,15 @@
 
 // ics
 #include "StepIC.h"
+#include "FluidAtRestIC.h"
 
 // bcs
 #include "SaintVenantSetWaterHeightInletBC.h"
 #include "SaintVenantSetWaterHeightOutletBC.h"
 #include "SaintVenantSetWaterVelocityInletBC.h"
-#include "SaintVenantSetWaterVelocity.h"
+#include "SaintVenantSetWaterVelocityOutletBC.h"
+#include "SaintVenantSetWaterMomentumInletBC.h"
+#include "SaintVenantSetWaterMomentumOutletBC.h"
 #include "SolidWallBC.h"
 
 // eos
@@ -99,12 +102,15 @@ SweExplicitApp::registerObjects(Factory & factory)
 
   // ics
   registerInitialCondition(StepIC);
+  registerInitialCondition(FluidAtRestIC);
 
   // bcs
   registerBoundaryCondition(SaintVenantSetWaterHeightInletBC);
   registerBoundaryCondition(SaintVenantSetWaterHeightOutletBC);
   registerBoundaryCondition(SaintVenantSetWaterVelocityInletBC);
-  registerBoundaryCondition(SaintVenantSetWaterVelocity);
+  registerBoundaryCondition(SaintVenantSetWaterVelocityOutletBC);
+  registerBoundaryCondition(SaintVenantSetWaterMomentumInletBC);
+  registerBoundaryCondition(SaintVenantSetWaterMomentumOutletBC);
   registerBoundaryCondition(SolidWallBC);
 
   // eos

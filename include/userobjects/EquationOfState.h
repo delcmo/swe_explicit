@@ -58,6 +58,9 @@ public:
   // Sound speed squared
   virtual Real c2(Real h=0., RealVectorValue hU=0.) const;
 
+  // Sound speed squared
+  virtual Real gravity() const;
+
 protected:
   // Prints an error message for non-implemented functions
   void error_not_implemented(std::string method_name) const;

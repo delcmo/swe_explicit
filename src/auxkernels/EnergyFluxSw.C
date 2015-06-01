@@ -29,8 +29,8 @@ InputParameters validParams<EnergyFluxSw>()
   params.addCoupledVar("hv", "y component of h*vec{u}");
   // Coupled aux variables
   params.addCoupledVar("b", "topology");
-  // Gravity
-  params.addParam<Real>("gravity", 9.81, "value of the gravity");
+  // Equation of state
+  params.addRequiredParam<UserObjectName>("eos", "Equation of state");
 
   return params;
 }
@@ -45,13 +45,13 @@ EnergyFluxSw::EnergyFluxSw(const std::string & name, InputParameters parameters)
     _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
     // Coupled aux variables
     _b(isCoupled("b") ? coupledValue("b") : _zero),
-    // Gravity:
-    _g(getParam<Real>("gravity"))
+    // Equation of state:
+    _eos(getUserObject<EquationOfState>("eos"))
 {}
 
 Real
 EnergyFluxSw::computeValue()
 {
   RealVectorValue U(_hu[_qp]/_h[_qp], _hv[_qp]/_h[_qp], 0.);
-  return _mom[_qp]*(_g*(_h[_qp]+_b[_qp])+0.5*U.size_sq());
+  return _mom[_qp]*(_eos.gravity()*(_h[_qp]+_b[_qp])+0.5*U.size_sq());
 }

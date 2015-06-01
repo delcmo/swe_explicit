@@ -35,6 +35,9 @@ protected:
   // x-boundaries
   Real _xmin;
   Real _xmax;
+
+  // amplitude
+  Real _amplitude;
 };
 
 #endif // VARIABLEDEPTHRIVERBED1D_H

@@ -1,21 +1,21 @@
-#ifndef SAINTVENANTSETWATERVELOCITYINLETBC_H
-#define SAINTVENANTSETWATERVELOCITYINLETBC_H
+#ifndef SAINTVENANTSETWATERMOMENTUMINLETBC_H
+#define SAINTVENANTSETWATERMOMENTUMINLETBC_H
 
 #include "IntegratedBC.h"
 #include "Function.h"
 
 // Forward Declarations
-class SaintVenantSetWaterVelocityInletBC;
+class SaintVenantSetWaterMomentumInletBC;
 class EquationOfState;
 
 template<>
-InputParameters validParams<SaintVenantSetWaterVelocityInletBC>();
+InputParameters validParams<SaintVenantSetWaterMomentumInletBC>();
 
-class SaintVenantSetWaterVelocityInletBC : public IntegratedBC
+class SaintVenantSetWaterMomentumInletBC : public IntegratedBC
 {
 public:
-  SaintVenantSetWaterVelocityInletBC(const std::string & name, InputParameters parameters);
-  virtual ~SaintVenantSetWaterVelocityInletBC(){}
+  SaintVenantSetWaterMomentumInletBC(const std::string & name, InputParameters parameters);
+  virtual ~SaintVenantSetWaterMomentumInletBC(){}
 
 protected:
   virtual Real computeQpResidual();
@@ -35,8 +35,8 @@ protected:
   VariableValue & _hu;
 
   // Constants and parameters
-  Real _u_bc;
   Real _h_bc;
+  Real _hu_bc;
 
   // Equation of state
   const EquationOfState & _eos;
@@ -49,5 +49,5 @@ protected:
   bool _h_bc_specified;
 };
 
-#endif // SAINTVENANTSETWATERVELOCITYINLETBC_H
+#endif // SAINTVENANTSETWATERMOMENTUMINLETBC_H
 

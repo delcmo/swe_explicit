@@ -58,6 +58,9 @@ public:
   // Sound speed squared
   virtual Real c2(Real h=0., RealVectorValue hU=0.) const;
 
+  // Gravity
+  virtual Real gravity() const;
+
 protected:
   Real _g;
 

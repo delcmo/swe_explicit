@@ -14,7 +14,6 @@ InputParameters validParams<MomentumEqu>()
   // Coupled aux variables
   params.addCoupledVar("b", "topology");
   // Constants and parameters
-  params.addRequiredParam<Real>("gravity", "gravity");
   params.addRequiredParam<unsigned int>("component", "number of component (0 = x, 1 = y)");
   // Equation of state
   params.addRequiredParam<UserObjectName>("eos", "Equation of state");
@@ -29,9 +28,8 @@ MomentumEqu::MomentumEqu(const std::string & name, InputParameters parameters)
     _hu(coupledValueOld("hu")),
     _hv(_mesh.dimension() == 2 ? coupledValueOld("hv") : _zero),
     // Coupled aux variables
-    _b_grad(isCoupled("b") ? coupledGradient("b") : _grad_zero),
+    _b_grad(isCoupled("b") ? coupledGradientOld("b") : _grad_zero),
     // Constants and parameters
-    _g(getParam<Real>("gravity")),
     _component(getParam<unsigned int>("component")),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
@@ -52,7 +50,7 @@ MomentumEqu::computeQpResidual()
   Real advc = _u[_qp]/_h[_qp]*(hU*_grad_test[_i][_qp]);
 
   // Topology
-  Real tplg_grad = _g*_h[_qp]*_b_grad[_qp](_component)*_test[_i][_qp];
+  Real tplg_grad = _eos.gravity()*_h[_qp]*_b_grad[_qp](_component)*_test[_i][_qp];
 
   // return value
   return -advc-p+tplg_grad;

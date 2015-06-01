@@ -48,3 +48,10 @@ HydrostaticPressure::c2(Real h, RealVectorValue hU) const
 {
   return _g*h;
 }
+
+// Gravity
+Real
+HydrostaticPressure::gravity() const
+{
+  return _g;
+}

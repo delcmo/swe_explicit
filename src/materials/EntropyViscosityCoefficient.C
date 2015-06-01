@@ -9,7 +9,6 @@ InputParameters validParams<EntropyViscosityCoefficient>()
   params.addParam<bool>("is_first_order", false, "if true, use the first-order viscosity coefficient");
   params.addParam<Real>("Ce", 1., "coefficient for high-order viscosity coefficient");
   params.addParam<Real>("Cmax", 0.5, "coefficient for first-order viscosity coefficient");
-  params.addParam<Real>("gravity", 9.81, "gravity");
   // Coupled variables
   params.addRequiredCoupledVar("h", "high/density");
   params.addRequiredCoupledVar("hu", "x component of h*\vec{u}");
@@ -34,7 +33,6 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     _is_first_order(getParam<bool>("is_first_order")),
     _Ce(getParam<Real>("Ce")),
     _Cmax(getParam<Real>("Cmax")),
-    _g(getParam<Real>("gravity")),
     // Coupled variables
     _h(coupledValue("h")),
     _hu(coupledValue("hu")),
@@ -100,10 +98,11 @@ EntropyViscosityCoefficient::computeQpProperties()
   _residual[_qp] = std::fabs(residual);
 
   // Froude number
-  Real Froude = hU.size()/_h[_qp]/std::sqrt(_g*(_h[_qp]+1.e-6));
+  Real Froude = hU.size()/_h[_qp]/std::sqrt(c2+1.e-6);
   
   // Normalization parameter
-  Real norm = _g*(_h[_qp]+_b[_qp]+1.e-6);
+//  Real norm = _eos.gravity()*(_h[_qp]+_b[_qp]+1.e-6);
+  Real norm = _eos.gravity()*std::fabs(_h[_qp]-_b[_qp]+1.e-6);
 
   // Compute the jump
   Real jump = std::max(_jump_x[_qp], _jump_y[_qp]);

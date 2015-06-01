@@ -19,8 +19,7 @@ InputParameters validParams<EntropyViscosityCoefficient>()
   params.addCoupledVar("G", "y-component of the entropy flux ");
   params.addCoupledVar("b", "topology");
   // Coupled variables: jump
-  params.addCoupledVar("jump_entropy_flux_x", "Jump of the x-componenet of the entropy flux");
-  params.addCoupledVar("jump_entropy_flux_y", "Jump of the y-componenet of the entropy flux");  
+  params.addCoupledVar("jump_entropy_flux", "Jump of the of the entropy flux");
   // Equation of state
   params.addRequiredParam<UserObjectName>("eos", "Equation of state");
 
@@ -47,8 +46,7 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     // Coupled aux variables: topology
     _b(isCoupled("b") ? coupledValue("b") : _zero),
     // Jump of the flux
-    _jump_x(isCoupled("jump_entropy_flux_x") ? coupledValue("jump_entropy_flux_x") : _zero),
-    _jump_y(isCoupled("jump_entropy_flux_y") ? coupledValue("jump_entropy_flux_y") : _zero),
+    _jump(isCoupled("jump_entropy_flux") ? coupledValue("jump_entropy_flux") : _zero),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Materials
@@ -77,7 +75,7 @@ EntropyViscosityCoefficient::computeQpProperties()
 {
   // Cell size
   Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
-  
+
   // Momentum vector
   RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
 
@@ -91,7 +89,7 @@ EntropyViscosityCoefficient::computeQpProperties()
   Real w0 = _t_step > 1 ? (2.*_dt+_dt_old)/(_dt*(_dt+_dt_old)) : 1. / _dt;
   Real w1 = _t_step > 1 ? -(_dt+_dt_old)/(_dt*_dt_old) : -1. / _dt;
   Real w2 = _t_step > 1 ? _dt/(_dt_old*(_dt+_dt_old)) : 0.;
-  
+
   // Entropy residual
   Real residual = w0*_E[_qp]+w1*_E_old[_qp]+w2*_E_older[_qp];
   residual += _F_grad[_qp](0)+_G_grad[_qp](1);
@@ -99,16 +97,13 @@ EntropyViscosityCoefficient::computeQpProperties()
 
   // Froude number
   Real Froude = hU.size()/_h[_qp]/std::sqrt(c2+1.e-6);
-  
+
   // Normalization parameter
 //  Real norm = _eos.gravity()*(_h[_qp]+_b[_qp]+1.e-6);
   Real norm = _eos.gravity()*std::fabs(_h[_qp]-_b[_qp]+1.e-6);
 
-  // Compute the jump
-  Real jump = std::max(_jump_x[_qp], _jump_y[_qp]);
-
   // High-order viscosity coefficient
-  Real kappa = _t_step == 1 ? _kappa_max[_qp] : _Ce*h_cell*h_cell*std::fabs(std::max(residual, jump)/norm);
+  Real kappa = _t_step == 1 ? _kappa_max[_qp] : _Ce*h_cell*h_cell*std::fabs(std::max(std::fabs(residual), _jump[_qp]))/norm;
 
   // Return value of the viscosity coefficient
   _kappa[_qp] = _is_first_order ? _kappa_max[_qp] : std::min(kappa, _kappa_max[_qp]);

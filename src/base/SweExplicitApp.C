@@ -18,7 +18,7 @@
 
 // ics
 #include "StepIC.h"
-#include "FluidAtRestIC.h"
+#include "IcsWithTopology1D.h"
 
 // bcs
 #include "SaintVenantSetWaterHeightInletBC.h"
@@ -102,7 +102,7 @@ SweExplicitApp::registerObjects(Factory & factory)
 
   // ics
   registerInitialCondition(StepIC);
-  registerInitialCondition(FluidAtRestIC);
+  registerInitialCondition(IcsWithTopology1D);
 
   // bcs
   registerBoundaryCondition(SaintVenantSetWaterHeightInletBC);

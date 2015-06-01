@@ -45,8 +45,7 @@ protected:
   VariableValue & _b;
 
   // Coupled variables: jumps
-  VariableValue & _jump_x;
-  VariableValue & _jump_y;
+  VariableValue & _jump;
 
   // Equation of state
   const EquationOfState & _eos;

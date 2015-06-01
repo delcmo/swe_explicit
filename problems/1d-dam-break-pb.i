@@ -1,6 +1,4 @@
 [GlobalParams]
-  implicit = false
-  lumping = true
 []
 
 [Mesh]
@@ -28,8 +26,8 @@
   
   [./jump]
     type = JumpInterface
-    variable = F_aux
-    var_name = jump_aux
+    entropy_flux_x = F_aux
+    var_name_jump = jump_aux
   [../]
 []
 
@@ -64,12 +62,14 @@
     type = WaterHeightEqu
     variable = h
     hu = hu
+    implicit = false
   [../]
 
   [./ArtDiffMass]
     type = ArtificialDissipativeFlux
     variable = h
     equ_name = continuity
+    implicit = false
   [../]
 
   [./TimeMmom]
@@ -83,15 +83,16 @@
     variable = hu
     h = h
     hu = hu
-    gravity = 9.8
     component = 0
     eos = hydro
+    implicit = false    
   [../]
   
   [./ArtDiffMom]
     type = ArtificialDissipativeFlux
     variable = hu
     equ_name = x_mom
+    implicit = false    
   [../]
 []
 
@@ -145,6 +146,7 @@
     variable = entropy_aux
     h = h
     hu = hu
+    eos = hydro    
   [../]
 
   [./F_ak]
@@ -153,6 +155,7 @@
     momentum = hu
     h = h
     hu = hu
+    eos = hydro    
   [../]
 
   [./kappa_ak]
@@ -274,8 +277,8 @@
 
 [Executioner]
   type = Transient
-  scheme = 'implicit-euler' # 'rk-2'
-  solve_type = 'LINEAR'
+  scheme = 'explicit-euler' # 'rk-2'
+  solve_type = 'JFNK'
 
   dt = 1.e-2
   
@@ -290,7 +293,7 @@
   nl_max_its = 10
 
   end_time = 3.
-#  num_steps = 1
+#  num_steps = 200
 
   [./Quadrature]
    type = GAUSS
@@ -304,5 +307,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 10
+  interval = 20
 []

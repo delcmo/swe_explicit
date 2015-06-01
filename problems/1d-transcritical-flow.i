@@ -26,8 +26,8 @@
   
   [./jump]
     type = JumpInterface
-    variable = F_aux
-    var_name = jump_aux
+    entropy_flux_x = F_aux
+    var_name_jump = jump_aux
   [../]
 []
 
@@ -36,7 +36,7 @@
     family = LAGRANGE
     order = FIRST
     [./InitialCondition]
-      type = FluidAtRestIC
+      type = IcsWithTopology1D
       H = 1.
       u = 0.3
       topology = topology
@@ -47,7 +47,7 @@
     family = LAGRANGE
     order = FIRST  
     [./InitialCondition]
-      type = FluidAtRestIC
+      type = IcsWithTopology1D
       H = 1.
       u = 0.3
       topology = topology
@@ -156,6 +156,7 @@
     variable = entropy_aux
     h = h
     hu = hu
+    eos = hydro
   [../]
   
   [./topology_ak]
@@ -170,6 +171,7 @@
     momentum = hu
     h = h
     hu = hu
+    eos = hydro    
   [../]
 
   [./kappa_ak]
@@ -210,7 +212,7 @@
     h = h
     hu = hu
     u = u_aux
-    eos = eos
+    eos = hydro
   [../]
 []
 
@@ -277,7 +279,7 @@
 
 [Executioner]
   type = Transient
-  scheme = 'rk-2'
+  scheme = 'explicit-euler' # 'rk-2'
   solve_type = 'PJFNK'
 
   dt = 1.e-2

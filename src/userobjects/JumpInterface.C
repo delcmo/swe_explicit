@@ -6,18 +6,26 @@ InputParameters validParams<JumpInterface>()
 {
   InputParameters params = validParams<InternalSideUserObject>();
 
-  params.addRequiredCoupledVar("variable", "the variable name this userobject is acting on.");  
-  params.addRequiredParam<std::string>("var_name", "the name of the variable that will store the smoothed variable.");
+  // Components of the entropy flux
+  params.addRequiredCoupledVar("entropy_flux_x", "The x-component of the entropy flux.");
+  params.addCoupledVar("entropy_flux_y", "The y-component of the entropy flux.");
+  // Variable storing the jump computed in this function
+  params.addRequiredParam<std::string>("var_name_jump", "the name of the variable that will store the smoothed variable.");
 
   return params;
 }
 
 JumpInterface::JumpInterface(const std::string & name, InputParameters parameters) :
     InternalSideUserObject(name, parameters),
+    // Auxiliary system
     _aux(_fe_problem.getAuxiliarySystem()),
-    _grad_u(coupledGradient("variable")),
-    _grad_u_neighbor(coupledNeighborGradient("variable")),
-    _var_name(getParam<std::string>("var_name")),
+    // Components of the entropy flux
+    _grad_F_x(coupledGradient("entropy_flux_x")),
+    _grad_F_x_neighbor(coupledNeighborGradient("entropy_flux_x")),
+    _grad_F_y(_mesh.dimension() == 2 ? coupledGradient("entropy_flux_y") : _grad_zero),
+    _grad_F_y_neighbor(_mesh.dimension() == 2 ? coupledNeighborGradient("entropy_flux_y") : _grad_zero),
+    // Variable storing the jump computed in this function
+    _var_name(getParam<std::string>("var_name_jump")),
     _value(0.)
 {}
 
@@ -47,7 +55,9 @@ JumpInterface::execute()
 
     for (unsigned int qp = 0; qp < _q_point.size(); ++qp)
     {
-      Real _value_temp = std::fabs(_grad_u[qp]*_normals[qp] - _grad_u_neighbor[qp]*_normals[qp]);
+      RealVectorValue grad_F(_grad_F_x[qp](0), _grad_F_y[qp](1), 0.);
+      RealVectorValue grad_F_neighbor(_grad_F_x[qp](0), _grad_F_y[qp](1), 0.);
+      Real _value_temp = std::fabs(grad_F*_normals[qp] - grad_F_neighbor*_normals[qp]);
       _value = std::max(_value_temp, _value);
     }
 

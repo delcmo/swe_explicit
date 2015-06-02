@@ -16,6 +16,7 @@
 #include "PressureSw.h"
 #include "EnergySw.h"
 #include "EnergyFluxSw.h"
+#include "FroudeNumberAux.h"
 
 // ics
 #include "StepIC.h"
@@ -101,6 +102,7 @@ SweExplicitApp::registerObjects(Factory & factory)
   registerAux(PressureSw);
   registerAux(EnergySw);
   registerAux(EnergyFluxSw);
+  registerAux(FroudeNumberAux);
 
   // ics
   registerInitialCondition(StepIC);

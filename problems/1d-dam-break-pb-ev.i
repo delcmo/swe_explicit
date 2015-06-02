@@ -111,6 +111,11 @@
     family = LAGRANGE
     order = FIRST
   [../]
+  
+  [./froude_aux]
+    family = LAGRANGE
+    order = FIRST
+  [../]
 
   [./kappa_aux]
     family = MONOMIAL
@@ -153,6 +158,14 @@
     type = EnergyFluxSw
     variable = F_aux
     momentum = hu
+    h = h
+    hu = hu
+    eos = hydro    
+  [../]
+  
+  [./froude_ak]
+    type = FroudeNumberAux
+    variable = froude_aux
     h = h
     hu = hu
     eos = hydro    
@@ -277,8 +290,8 @@
 
 [Executioner]
   type = Transient
-  scheme = 'explicit-euler' # 'rk-2'
-  solve_type = 'JFNK'
+  scheme = 'rk-2'
+#  solve_type = 'JFNK'
   
   [./TimeStepper]
     type = PostprocessorDT
@@ -287,11 +300,11 @@
   [../]
 
   nl_rel_tol = 1e-12
-  nl_abs_tol = 1e-6
+  nl_abs_tol = 1e-10
   nl_max_its = 10
 
   end_time = 3.
-#  num_steps = 200
+  num_steps = 200
 
   [./Quadrature]
    type = GAUSS
@@ -305,5 +318,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 1
+  interval = 10
 []

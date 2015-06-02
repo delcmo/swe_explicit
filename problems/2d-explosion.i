@@ -68,12 +68,14 @@
     variable = h
     hu = hu
     hv = hv
+    implicit = false
   [../]
   
   [./MassDissip]
     type = ArtificialDissipativeFlux
     variable = h
     equ_name = continuity
+    implicit = false    
   [../]
 
   # x-momentum equation
@@ -87,16 +89,17 @@
   variable = hu
   h = h
   hu = hu
-  hv = hv  
-  gravity = 9.8
+  hv = hv
   component = 0
   eos = hydro
+  implicit = false  
   [../]
 
   [./XMomDissip]
     type = ArtificialDissipativeFlux
     variable = hu
     equ_name = x_mom
+    implicit = false    
   [../]
 
   # y-momentum equation  
@@ -111,15 +114,16 @@
   h = h
   hu = hu
   hv = hv
-  gravity = 9.8
   component = 1
   eos = hydro
+  implicit = false  
   [../]
 
   [./YMomDissip]
     type = ArtificialDissipativeFlux
     variable = hv
     equ_name = y_mom
+    implicit = false    
   [../]
 []
 
@@ -162,6 +166,7 @@
     h = h
     hu = hu
     hv = hv
+    eos = hydro
   [../]
 
   [./F_ak]
@@ -171,6 +176,7 @@
     h = h
     hu = hu
     hv = hv
+    eos = hydro
   [../]
 
   [./G_ak]
@@ -180,6 +186,7 @@
     h = h
     hu = hu
     hv = hv    
+    eos = hydro
   [../]
 
   [./kappa_ak]
@@ -205,7 +212,7 @@
   [./EntropyViscosityCoeff]
     type = EntropyViscosityCoefficient
     block = 0
-    is_first_order = false
+    is_first_order = true
     h = h
     hu = hu
     hv = hv
@@ -239,21 +246,37 @@
   [../]
 []
 
+[Postprocessors]
+  [./dt]
+    type = TimeStepCFL
+    h = h
+    hu = hu
+    hv = hv
+    eos = hydro
+    cfl = 0.2
+    outputs = none
+  [../]
+[]
+
 [Preconditioning]
   [./FDP]
     type = SMP
     full = true
     solve_type = 'PJFNK'
-#    petsc_options_iname = '-pc_type'
-#    petsc_options_value = 'lu'
+    petsc_options_iname = '-pc_type'
+    petsc_options_value = 'lu'
   [../]
 []
 
 [Executioner]
   type = Transient
-  scheme = bdf2
+  scheme = 'explicit-euler'
   
-  dt = 5.e-4
+  [./TimeStepper]
+    type = PostprocessorDT
+    postprocessor = dt
+    dt = 1.e-5
+  [../]
 
   nl_rel_tol = 1e-12
   nl_abs_tol = 1e-8

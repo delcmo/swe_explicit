@@ -122,6 +122,11 @@
     order = FIRST
   [../]
 
+  [./froude_aux]
+    family = LAGRANGE
+    order = FIRST
+  [../]
+
   [./kappa_aux]
     family = MONOMIAL
     order = CONSTANT
@@ -173,6 +178,14 @@
     hu = hu
     eos = hydro    
   [../]
+  
+  [./froude_ak]
+    type = FroudeNumberAux
+    variable = froude_aux
+    h = h
+    hu = hu
+    eos = hydro    
+  [../]  
 
   [./kappa_ak]
     type = MaterialRealAux
@@ -279,7 +292,7 @@
 
 [Executioner]
   type = Transient
-  scheme = 'explicit-euler' # 'rk-2'
+  scheme = 'rk-2'
   solve_type = 'PJFNK'
 
   dt = 1.e-2
@@ -295,7 +308,7 @@
   nl_max_its = 10
 
   end_time = 15.
-#  num_steps = 20
+  num_steps = 200
 
   [./Quadrature]
    type = GAUSS
@@ -309,5 +322,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 50
+  interval = 10
 []

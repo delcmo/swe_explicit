@@ -24,11 +24,11 @@ InputParameters validParams<MomentumEqu>()
 MomentumEqu::MomentumEqu(const std::string & name, InputParameters parameters)
   :Kernel(name, parameters),
     // Coupled variables
-    _h(coupledValueOld("h")),
-    _hu(coupledValueOld("hu")),
-    _hv(_mesh.dimension() == 2 ? coupledValueOld("hv") : _zero),
+    _h(coupledValue("h")),
+    _hu(coupledValue("hu")),
+    _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
     // Coupled aux variables
-    _b_grad(isCoupled("b") ? coupledGradientOld("b") : _grad_zero),
+    _b_grad(isCoupled("b") ? coupledGradient("b") : _grad_zero),
     // Constants and parameters
     _component(getParam<unsigned int>("component")),
     // Equation of state:

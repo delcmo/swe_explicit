@@ -15,8 +15,8 @@ InputParameters validParams<WaterHeightEqu>()
 
 WaterHeightEqu::WaterHeightEqu(const std::string & name, InputParameters parameters)
   :Kernel(name, parameters),
-    _hu(coupledValueOld("hu")),
-    _hv(_mesh.dimension() == 2 ? coupledValueOld("hv") : _zero),
+    _hu(coupledValue("hu")),
+    _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
     _hu_var(coupled("hu")),
     _hv_var(_mesh.dimension() == 2 ? coupled("hv") : 0)
 {}

@@ -53,7 +53,7 @@
 
 [Kernels]
   [./TimeMass]
-    type = TimeDerivative
+    type = LumpedTimeDerivative
     variable = h
     implicit = true    
   [../]
@@ -73,7 +73,7 @@
   [../]
 
   [./TimeMmom]
-    type = TimeDerivative
+    type = LumpedTimeDerivative
     variable = hu
     implicit = true
   [../]
@@ -290,7 +290,7 @@
 
 [Executioner]
   type = Transient
-  scheme = 'rk-2'
+  scheme = 'explicit-euler' # 'rk-2'
 #  solve_type = 'JFNK'
   
   [./TimeStepper]
@@ -304,7 +304,7 @@
   nl_max_its = 10
 
   end_time = 3.
-  num_steps = 200
+  num_steps = 20
 
   [./Quadrature]
    type = GAUSS
@@ -318,5 +318,5 @@
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 10
+  interval = 1
 []

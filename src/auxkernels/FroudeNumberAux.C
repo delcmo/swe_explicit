@@ -48,5 +48,5 @@ FroudeNumberAux::computeValue()
   RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
 
   // Return the value of the Froude number
-  return hU.size()/(_h[_qp]*_eos.c2(_h[_qp], hU));
+  return hU.size()/(_h[_qp]*std::sqrt(_eos.c2(_h[_qp], hU)));
 }

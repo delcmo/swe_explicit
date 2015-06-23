@@ -50,7 +50,7 @@ private:
   MooseEnum _equ_type;
 
   // Material.
-  MaterialProperty<Real> & _kappa;
+  const MaterialProperty<Real> & _kappa;
 };
 
 #endif // ARTIFICIALDISSIPATIVEFLUX_H

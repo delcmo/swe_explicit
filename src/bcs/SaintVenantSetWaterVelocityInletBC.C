@@ -32,7 +32,7 @@ SaintVenantSetWaterVelocityInletBC::SaintVenantSetWaterVelocityInletBC(const std
     _hu(coupledValue("hu")),
     // Constants and parameters
     _u_bc(getParam<Real>("u_bc")),
-    _h_bc(isCoupled("h_bc") ? getParam<Real>("h_bc") : 0.),
+    _h_bc(isParamValid("h_bc") ? getParam<Real>("h_bc") : 0.),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Integer for jacobian terms
@@ -43,7 +43,7 @@ SaintVenantSetWaterVelocityInletBC::SaintVenantSetWaterVelocityInletBC(const std
   mooseAssert(_mesh.dimension() > 1, "'" << this->name() << "' can only be used with 1-D mesh since it is designed for the Saint-Venant equations.");
 
   // Determine whether or not u_bc is specified in the input file
-  _h_bc_specified = isCoupled("h_bc") ? true : false;
+  _h_bc_specified = parameters.isParamValid("h_bc") ? true : false;
 }
 
 Real

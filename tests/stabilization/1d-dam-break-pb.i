@@ -67,7 +67,6 @@
     variable = hu
     h = h
     hu = hu
-    gravity = 9.8
     component = 0
     eos = hydro
   [../]
@@ -113,6 +112,7 @@
     variable = entropy_aux
     h = h
     hu = hu
+    eos = hydro
   [../]
 
   [./F_ak]
@@ -121,6 +121,7 @@
     momentum = hu
     h = h
     hu = hu
+    eos = hydro
   [../]
 
   [./kappa_ak]

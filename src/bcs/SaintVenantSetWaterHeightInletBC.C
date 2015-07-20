@@ -31,7 +31,7 @@ SaintVenantSetWaterHeightInletBC::SaintVenantSetWaterHeightInletBC(const std::st
     _hu(coupledValue("hu")),
     // Constants and parameters
     _h_bc(getParam<Real>("h_bc")),
-    _u_bc(isCoupled("u_bc") ? getParam<Real>("u_bc") : 0.),
+    _u_bc(isParamValid("u_bc") ? getParam<Real>("u_bc") : 0.),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Integer for jacobian terms
@@ -41,7 +41,7 @@ SaintVenantSetWaterHeightInletBC::SaintVenantSetWaterHeightInletBC(const std::st
   if (_mesh.dimension() >= 2)
     mooseError("'" << this->name() << "' can only be used with 1-D mesh since it is designed for the Saint-Venant equations.");
   // Determine whether or not u_bc is specified in the input file
-  _u_bc_specified = isCoupled("u_bc") ? true : false;
+  _u_bc_specified = parameters.isParamValid("u_bc") ? true : false;
 }
 
 Real

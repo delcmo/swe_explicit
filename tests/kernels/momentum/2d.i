@@ -87,8 +87,7 @@
   variable = hu
   h = h
   hu = hu
-  hv = hv  
-  gravity = 9.8
+  hv = hv
   component = 0
   eos = hydro
   [../]
@@ -111,7 +110,6 @@
   h = h
   hu = hu
   hv = hv
-  gravity = 9.8
   component = 1
   eos = hydro
   [../]
@@ -157,6 +155,7 @@
     h = h
     hu = hu
     hv = hv
+    eos = hydro
   [../]
 
   [./F_ak]
@@ -166,6 +165,7 @@
     h = h
     hu = hu
     hv = hv
+    eos = hydro
   [../]
 
   [./G_ak]
@@ -174,7 +174,8 @@
     momentum = hv
     h = h
     hu = hu
-    hv = hv    
+    hv = hv
+    eos = hydro
   [../]
 
   [./kappa_ak]

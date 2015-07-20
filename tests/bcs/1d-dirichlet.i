@@ -55,9 +55,7 @@
   variable = hu
   h = h
   hu = hu
-  gravity = 9.8
   component = 0
-  topology = topology
   eos = hydro
   [../]
 []
@@ -85,7 +83,7 @@
   [../]
   
   [./left_hu]
-    type = SaintVenantSetWaterVelocity
+    type = SaintVenantSetWaterVelocityInletBC
     variable = hu
     boundary = left
     equ_name = x_mom
@@ -96,7 +94,7 @@
   [../]
 
   [./right_hu]
-    type = SaintVenantSetWaterVelocity
+    type = SaintVenantSetWaterVelocityOutletBC
     variable = hu
     boundary = right
     equ_name = x_mom

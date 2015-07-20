@@ -56,11 +56,10 @@ JumpInterface::execute()
     for (unsigned int qp = 0; qp < _q_point.size(); ++qp)
     {
       RealVectorValue grad_F(_grad_F_x[qp](0), _grad_F_y[qp](1), 0.);
-      RealVectorValue grad_F_neighbor(_grad_F_x[qp](0), _grad_F_y[qp](1), 0.);
-      Real _value_temp = std::fabs(grad_F*_normals[qp] - grad_F_neighbor*_normals[qp]);
-      _value = std::max(_value_temp, _value);
+      RealVectorValue grad_F_neighbor(_grad_F_x_neighbor[qp](0), _grad_F_y_neighbor[qp](1), 0.);
+      Real value_temp = std::fabs(grad_F*_normals[qp] - grad_F_neighbor*_normals[qp]);
+      _value = std::max(value_temp, _value);
     }
-
     dof_nb = _current_elem->dof_number(_aux.number(), _fe_problem.getVariable(_tid, _var_name).number(), 0);
     dof_nb_neighbor = _neighbor_elem->dof_number(_aux.number(), _fe_problem.getVariable(_tid, _var_name).number(), 0);
 

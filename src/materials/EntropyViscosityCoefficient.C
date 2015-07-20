@@ -7,7 +7,8 @@ InputParameters validParams<EntropyViscosityCoefficient>()
 
   // Parameters
   params.addParam<bool>("is_first_order", false, "if true, use the first-order viscosity coefficient");
-  params.addParam<Real>("Ce", 1., "coefficient for high-order viscosity coefficient");
+  params.addParam<Real>("Ce", 1., "coefficient for entropy residual");
+  params.addParam<Real>("Cjump", 1., "coefficient for jump");
   params.addParam<Real>("Cmax", 0.5, "coefficient for first-order viscosity coefficient");
   // Coupled variables
   params.addRequiredCoupledVar("h", "high/density");
@@ -31,6 +32,7 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     // Parameters
     _is_first_order(getParam<bool>("is_first_order")),
     _Ce(getParam<Real>("Ce")),
+    _Cjump(getParam<Real>("Cjump")),
     _Cmax(getParam<Real>("Cmax")),
     // Coupled variables
     _h(coupledValue("h")),
@@ -93,6 +95,7 @@ EntropyViscosityCoefficient::computeQpProperties()
   // Entropy residual
   Real residual = w0*_E[_qp]+w1*_E_old[_qp]+w2*_E_older[_qp];
   residual += _F_grad[_qp](0)+_G_grad[_qp](1);
+  residual *= _Ce;
   _residual[_qp] = std::fabs(residual);
 
   // Froude number
@@ -100,10 +103,11 @@ EntropyViscosityCoefficient::computeQpProperties()
 
   // Normalization parameter
 //  Real norm = _eos.gravity()*(_h[_qp]+_b[_qp]+1.e-6);
-  Real norm = _eos.gravity()*std::fabs(_h[_qp]-_b[_qp]+1.e-6);
+//  Real norm = _eos.gravity()*std::fabs(_h[_qp]-_b[_qp]+1.e-6);
+  Real norm = _eos.gravity()*std::fabs(_h[_qp]+1.e-6);
 
   // High-order viscosity coefficient
-  Real kappa = _t_step == 1 ? _kappa_max[_qp] : _Ce*h_cell*h_cell*std::fabs(std::max(std::fabs(residual), _jump[_qp]))/norm;
+  Real kappa = _t_step == 1 ? _kappa_max[_qp] : h_cell*h_cell*std::fabs(std::max(std::fabs(residual), _Cjump*_jump[_qp]))/norm;
 
   // Return value of the viscosity coefficient
   _kappa[_qp] = _is_first_order ? _kappa_max[_qp] : std::min(kappa, _kappa_max[_qp]);

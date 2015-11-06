@@ -17,10 +17,12 @@
 #include "EnergySw.h"
 #include "EnergyFluxSw.h"
 #include "FroudeNumberAux.h"
+#include "FirstOrderViscCoeff.h"
 
 // ics
 #include "StepIC.h"
 #include "IcsWithTopology1D.h"
+#include "AuxVariablesICs.h"
 
 // bcs
 #include "SaintVenantSetWaterHeightInletBC.h"
@@ -103,10 +105,12 @@ SweExplicitApp::registerObjects(Factory & factory)
   registerAux(EnergySw);
   registerAux(EnergyFluxSw);
   registerAux(FroudeNumberAux);
+  registerAux(FirstOrderViscCoeff);
 
   // ics
   registerInitialCondition(StepIC);
   registerInitialCondition(IcsWithTopology1D);
+  registerInitialCondition(AuxVariablesICs);
 
   // bcs
   registerBoundaryCondition(SaintVenantSetWaterHeightInletBC);

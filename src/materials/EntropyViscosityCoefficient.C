@@ -35,16 +35,16 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     _Cjump(getParam<Real>("Cjump")),
     _Cmax(getParam<Real>("Cmax")),
     // Coupled variables
-    _h(coupledValue("h")),
-    _hu(coupledValue("hu")),
-    _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
+    _h(coupledValueOld("h")),
+    _hu(coupledValueOld("hu")),
+    _hv(_mesh.dimension() == 2 ? coupledValueOld("hv") : _zero),
     // Coupled aux variables: entropy
     _E(coupledValue("entropy")),
     _E_old(coupledValueOld("entropy")),
     _E_older(coupledValueOlder("entropy")),
     // Coupled aux variables: entropy flux
-    _F_grad(coupledGradient("F")),
-    _G_grad(_mesh.dimension() == 2 ? coupledGradient("G") : _grad_zero),
+    _F_grad_old(coupledGradientOld("F")),
+    _G_grad_old(_mesh.dimension() == 2 ? coupledGradientOld("G") : _grad_zero),
     // Coupled aux variables: topology
     _b(isCoupled("b") ? coupledValue("b") : _zero),
     // Jump of the flux
@@ -52,7 +52,6 @@ EntropyViscosityCoefficient::EntropyViscosityCoefficient(const std::string & nam
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos")),
     // Materials
-    _kappa_old(declarePropertyOld<Real>("kappa")),
     _kappa(declareProperty<Real>("kappa")),
     _kappa_max(declareProperty<Real>("kappa_max")),
     _residual(declareProperty<Real>("residual"))
@@ -69,7 +68,7 @@ EntropyViscosityCoefficient::initQpStatefulProperties()
   Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
 
   // Set value for the material
-  _kappa[_qp] = _Cmax*h_cell;
+  _kappa[_qp] = 0.5 * h_cell * std::sqrt(3);
 }
 
 void
@@ -88,15 +87,26 @@ EntropyViscosityCoefficient::computeQpProperties()
   _kappa_max[_qp] = _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
 
   // Weights for BDF2
-  Real w0 = _t_step > 1 ? (2.*_dt+_dt_old)/(_dt*(_dt+_dt_old)) : 1. / _dt;
-  Real w1 = _t_step > 1 ? -(_dt+_dt_old)/(_dt*_dt_old) : -1. / _dt;
-  Real w2 = _t_step > 1 ? _dt/(_dt_old*(_dt+_dt_old)) : 0.;
+  Real w0 = _t_step > 2 ? (2.*_dt+_dt_old)/(_dt*(_dt+_dt_old)) : 1. / _dt;
+  Real w1 = _t_step > 2 ? -(_dt+_dt_old)/(_dt*_dt_old) : -1. / _dt;
+  Real w2 = _t_step > 2 ? _dt/(_dt_old*(_dt+_dt_old)) : 0.;
 
   // Entropy residual
-  Real residual = w0*_E[_qp]+w1*_E_old[_qp]+w2*_E_older[_qp];
-  residual += _F_grad[_qp](0)+_G_grad[_qp](1);
+//  Real residual = w0*_E[_qp]+w1*_E_old[_qp]+w2*_E_older[_qp];
+  //std::cout<<"============================================="<<std::endl;
+  //std::cout<<"E old="<<_E_old[_qp]<<" and E older"<<_E_older[_qp]<<std::endl;
+  //std::cout<<"Flux old="<<_F_grad_old[_qp](0)<<std::endl;
+  Real residual = (_E_old[_qp]-_E_older[_qp])/_dt_old;
+  //std::cout<<"dE/dt="<<residual<<std::endl;
+  residual += _F_grad_old[_qp](0)+_G_grad_old[_qp](1);
+  _residual[_qp] = residual;
   residual *= _Ce;
-  _residual[_qp] = std::fabs(residual);
+
+//  std::cout<<"&&&&&&&&&&&&&&&&&&&&&&&"<<std::endl;
+//  std::cout<<"E="<<_E[_qp]<<std::endl;
+//  std::cout<<"E_old="<<_E_old[_qp]<<std::endl;
+//  std::cout<<"E_older="<<_E_older[_qp]<<std::endl;
+//  std::cout<<"residual="<<residual<<std::endl;
 
   // Froude number
   Real Froude = hU.size()/_h[_qp]/std::sqrt(c2+1.e-6);
@@ -107,7 +117,7 @@ EntropyViscosityCoefficient::computeQpProperties()
   Real norm = _eos.gravity()*std::fabs(_h[_qp]+1.e-6);
 
   // High-order viscosity coefficient
-  Real kappa = _t_step == 1 ? _kappa_max[_qp] : h_cell*h_cell*std::fabs(std::max(std::fabs(residual), _Cjump*_jump[_qp]))/norm;
+  Real kappa = _t_step <= 2 ? _kappa_max[_qp] : h_cell*h_cell*std::fabs(std::max(std::fabs(residual), _Cjump*_jump[_qp]))/norm;
 
   // Return value of the viscosity coefficient
   _kappa[_qp] = _is_first_order ? _kappa_max[_qp] : std::min(kappa, _kappa_max[_qp]);

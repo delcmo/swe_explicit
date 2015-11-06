@@ -1,12 +1,16 @@
 [GlobalParams]
+lumping = true
+is_first_order = true
+Ce = 1.
+Cjump = 4.1
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 1
   xmin = -5.
-  xmax = 5.
-  nx = 200
+  xmax = +5
+  nx = 32
 []
 
 [Functions]
@@ -14,20 +18,37 @@
     axis = 0
     type = PiecewiseLinear
     x = '-5  0  0.0001 5'
-    y = '3 3  1  1'
+    y = ' 3  3  1    1'
   [../]
 []
 
 [UserObjects]
   [./hydro]
     type = HydrostaticPressure
-    gravity = 1.
+    gravity = 1.0
   [../]
   
   [./jump]
     type = JumpInterface
     entropy_flux_x = F_aux
     var_name_jump = jump_aux
+    execute_on = 'initial timestep_begin'
+  [../]
+
+  [./jump-smooth]
+    type = MaterialSmoothing
+    smoothing_fct_name = average
+    variable = jump_aux
+    var_name = jump_smooth_aux
+    execute_on = 'initial timestep_begin'
+  [../]
+
+  [./jump-smooth-bis]
+    type = MaterialSmoothing
+    smoothing_fct_name = average
+    variable = jump_smooth_aux
+    var_name = jump_smooth_bis_aux
+    execute_on = 'initial timestep_begin'
   [../]
 []
 
@@ -53,7 +74,7 @@
 
 [Kernels]
   [./TimeMass]
-    type = LumpedTimeDerivative
+    type = TimeDerivative
     variable = h
     implicit = true    
   [../]
@@ -68,12 +89,13 @@
   [./ArtDiffMass]
     type = ArtificialDissipativeFlux
     variable = h
+    fo_visc_coeff = fo_visc_aux
     equ_name = continuity
     implicit = false
   [../]
 
   [./TimeMmom]
-    type = LumpedTimeDerivative
+    type = TimeDerivative
     variable = hu
     implicit = true
   [../]
@@ -85,14 +107,15 @@
     hu = hu
     component = 0
     eos = hydro
-    implicit = false    
+    implicit = false
   [../]
   
   [./ArtDiffMom]
     type = ArtificialDissipativeFlux
     variable = hu
+    fo_visc_coeff = fo_visc_aux
     equ_name = x_mom
-    implicit = false    
+    implicit = false
   [../]
 []
 
@@ -117,6 +140,11 @@
     order = FIRST
   [../]
 
+  [./fo_visc_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+
   [./kappa_aux]
     family = MONOMIAL
     order = CONSTANT
@@ -136,6 +164,16 @@
     family = MONOMIAL
     order = CONSTANT
   [../]
+
+  [./jump_smooth_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+
+  [./jump_smooth_bis_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
 []
 
 [AuxKernels]
@@ -144,6 +182,7 @@
     variable = u_aux
     h = h
     hu = hu
+    execute_on = 'initial linear'
   [../]
 
   [./entropy_ak]
@@ -151,7 +190,8 @@
     variable = entropy_aux
     h = h
     hu = hu
-    eos = hydro    
+    eos = hydro
+    execute_on = 'initial linear'
   [../]
 
   [./F_ak]
@@ -160,7 +200,8 @@
     momentum = hu
     h = h
     hu = hu
-    eos = hydro    
+    eos = hydro
+    execute_on = 'initial linear'
   [../]
   
   [./froude_ak]
@@ -168,25 +209,38 @@
     variable = froude_aux
     h = h
     hu = hu
-    eos = hydro    
+    eos = hydro
+    execute_on = 'initial linear'
+  [../]
+
+  [./fo_visc_ak]
+    type = FirstOrderViscCoeff
+    variable = fo_visc_aux
+    h = h
+    hu = hu
+    eos = hydro
+    execute_on = 'initial linear'
   [../]
 
   [./kappa_ak]
     type = MaterialRealAux
     variable = kappa_aux
     property = kappa
+    execute_on = 'initial linear'
   [../]
 
   [./kappa_max_ak]
     type = MaterialRealAux
     variable = kappa_max_aux
     property = kappa_max
+    execute_on = 'initial linear'
   [../]
  
   [./residual_ak]
     type = MaterialRealAux
     variable = residual_aux
     property = residual
+    execute_on = 'initial linear'
   [../]
 []
 
@@ -194,128 +248,86 @@
   [./EntropyViscosityCoeff]
     type = EntropyViscosityCoefficient
     block = 0
-    is_first_order = true
-    Ce = 1.
     h = h
     hu = hu
     entropy = entropy_aux
     F = F_aux
+    jump_entropy_flux = jump_smooth_bis_aux
     eos = hydro
   [../]
 []
 
 [BCs]
- active='h_bc_left h_bc_right hu_bc_left hu_bc_right'
   [./h_bc_left]
-    type = SaintVenantSetWaterHeightOutletBC
+    type = DirichletBC
     variable = h
+    value = 3.
     boundary = left
-    equ_name = continuity
-    h = h
-    hu = hu
-    h_bc = 3
-    eos = hydro
-    implicit = true 
   [../]
 
   [./h_bc_right]
-    type = SaintVenantSetWaterHeightOutletBC
+    type = DirichletBC
     variable = h
+    value = 1.
     boundary = right
-    equ_name = continuity
-    h = h
-    hu = hu
-    h_bc = 1
-    eos = hydro
-    implicit = true
   [../]
 
   [./hu_bc_left]
-    type = SaintVenantSetWaterHeightOutletBC
+    type = DirichletBC
     variable = hu
+    value = 0.
     boundary = left
-    equ_name = x_mom
-    h = h
-    hu = hu
-    h_bc = 3.
-    eos = hydro
-    implicit = true
   [../]
 
   [./hu_bc_right]
-    type = SaintVenantSetWaterHeightOutletBC
+    type = DirichletBC
     variable = hu
+    value = 0.
     boundary = right
-    equ_name = x_mom
-    h = h
-    hu = hu
-    h_bc = 1
-    eos = hydro
-    implicit = true
-  [../]
-
-  [./h_bc_wall]
-    type = SolidWallBC
-    variable = h
-    boundary = 'right left'
-    equ_name = continuity
-    h = h
-    hu = hu
-    eos = hydro
-    implicit = true
-  [../]
-
-  [./hu_bc_wall]
-    type = SolidWallBC
-    variable = hu
-    boundary = 'right left'
-    equ_name = x_mom
-    h = h
-    hu = hu
-    eos = hydro
-    implicit = true
   [../]
 []
 
 [Postprocessors]
+  #active = ''
   [./dt]
     type = TimeStepCFL
     h = h
     hu = hu
     eos = hydro
-    cfl = 0.2
-    outputs = none
+    cfl = 1.
+#    outputs = none
   [../]
 []
 
 [Executioner]
   type = Transient
-  scheme = 'explicit-euler' # 'rk-2'
+  scheme = 'explicit-euler'
   solve_type = 'LINEAR'
-  dt = 1e-4
-  
-  [./TimeStepper]
-    type = PostprocessorDT
-    postprocessor = dt
-    dt = 1.e-5
-  [../]
+  dt = 0.05
+
+#  [./TimeStepper]
+#    type = PostprocessorDT
+#    postprocessor = dt
+#    dt = 1.e-5
+#  [../]
 
   nl_rel_tol = 1e-12
   nl_abs_tol = 1e-10
-#  nl_max_its = 10
+  nl_max_its = 30
 
   end_time = 2.
-#  num_steps = 20
+  num_steps = 2
 
   [./Quadrature]
-   type = GAUSS
+    type = GAUSS
     order = SECOND
   [../]
-
+  compute_aux_inital = true
 []
 
 [Outputs]
   output_initial = true
+  output_final = true
   exodus = true
   print_linear_residuals = false
   print_perf_log = true

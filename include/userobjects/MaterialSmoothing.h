@@ -37,13 +37,25 @@ public:
   Real getValue() const { return _value; }  
 
 protected:
+  // Moose enum for smoothing function
+  enum SmoothingFnctType
+  {
+    max = 0,
+    min = 1,
+    average = 2
+  };
+  MooseEnum _smthg_fct_type;
+
   // Auxiliary system variable:
   AuxiliarySystem & _aux;
+
   // Gradient value:
-  VariableGradient & _grad_u;
-  VariableGradient & _grad_u_neighbor;
+  VariableValue & _u;
+  VariableValue & _u_neighbor;
+
   // Name of the variable storing the jump:
   std::string _var_name;
+
   // Temporary variable:
   Real _value;
 };

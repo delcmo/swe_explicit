@@ -12,47 +12,37 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ARTIFICIALDISSIPATIVEFLUX_H
-#define ARTIFICIALDISSIPATIVEFLUX_H
+#ifndef FIRSTORDERVISCCOEFF_H
+#define FIRSTORDERVISCCOEFF_H
 
-#include "Kernel.h"
+#include "AuxKernel.h"
+#include "EquationOfState.h"
 
-// Forward Declarations
-class ArtificialDissipativeFlux;
+class FirstOrderViscCoeff;
 
 template<>
-InputParameters validParams<ArtificialDissipativeFlux>();
+InputParameters validParams<FirstOrderViscCoeff>();
 
-class ArtificialDissipativeFlux : public Kernel
+class FirstOrderViscCoeff : public AuxKernel
 {
 public:
 
-  ArtificialDissipativeFlux(const std::string & name,
-             InputParameters parameters);
+  FirstOrderViscCoeff(const std::string & name, InputParameters parameters);
 
 protected:
+  virtual Real computeValue();
 
-  virtual Real computeQpResidual();
+  virtual void compute();
 
-  virtual Real computeQpJacobian();
+  // Parameters
+  Real _Cmax;
 
-  virtual Real computeQpOffDiagJacobian(unsigned int _jvar);
-    
-private:
-  // Aux variables
-  VariableValue & _fo_visc;
+  VariableValue & _h;
+  VariableValue & _hu;
+  VariableValue & _hv;
 
-  // Equation type
-  enum EquationType
-  {
-      continuity = 0,
-      x_mom = 1,
-      y_mom = 2
-  };
-  MooseEnum _equ_type;
-
-  // Material.
-  const MaterialProperty<Real> & _kappa;
+  // Equation of state
+  const EquationOfState & _eos;
 };
 
-#endif // ARTIFICIALDISSIPATIVEFLUX_H
+#endif // FIRSTORDERVISCCOEFF_H

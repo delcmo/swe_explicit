@@ -39,8 +39,8 @@ protected:
   VariableValue & _E_older;
 
   // Coupled aux variables: entropy flux
-  VariableGradient & _F_grad;
-  VariableGradient & _G_grad;
+  VariableGradient & _F_grad_old;
+  VariableGradient & _G_grad_old;
 
   // COupled aux variables: topology
   VariableValue & _b;
@@ -52,7 +52,6 @@ protected:
   const EquationOfState & _eos;
 
   // material to compute
-  MaterialProperty<Real> & _kappa_old;
   MaterialProperty<Real> & _kappa;
   MaterialProperty<Real> & _kappa_max;
   MaterialProperty<Real> & _residual;

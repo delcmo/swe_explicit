@@ -21,6 +21,8 @@ InputParameters validParams<ArtificialDissipativeFlux>()
 {
   InputParameters params = validParams<Kernel>();
 
+  // Coupled aux variables
+  params.addCoupledVar("fo_visc_coeff", "first-order viscosity coefficient aux variable");
   // Equation name:
   params.addParam<std::string>("equ_name", "invalid", "Name of the equation.");
 
@@ -30,25 +32,35 @@ InputParameters validParams<ArtificialDissipativeFlux>()
 ArtificialDissipativeFlux::ArtificialDissipativeFlux(const std::string & name,
                        InputParameters parameters) :
   Kernel(name, parameters),
+    // Coupled aux variables
+    _fo_visc(isCoupled("fo_visc_coeff") ? coupledValue("fo_visc_coeff") : _zero),
     // Equation name
     _equ_type("continuity x_mom y_mom invalid", getParam<std::string>("equ_name")),
     // Material
-    _kappa(_is_implicit ? getMaterialProperty<Real>("kappa") : getMaterialPropertyOld<Real>("kappa"))
+    _kappa(getMaterialProperty<Real>("kappa"))
+//    _kappa(_is_implicit ? getMaterialProperty<Real>("kappa") : getMaterialPropertyOld<Real>("kappa"))
 {}
 
 Real ArtificialDissipativeFlux::computeQpResidual()
 {
+//  Real kappa = _kappa[_qp];
+  Real kappa = _fo_visc[_qp];
+
+  std::cout<<"=========================="<<std::endl;
+  std::cout<<"kappa="<<kappa<<std::endl;
 
   switch (_equ_type)
   {
-    case continuity:
-    return _kappa[_qp]*_grad_u[_qp]*_grad_test[_i][_qp];
+  case continuity:
+//    std::cout<<"cont="<<kappa*_grad_u[_qp]*_grad_test[_i][_qp]<<std::endl;
+    return kappa*_grad_u[_qp]*_grad_test[_i][_qp];
     break;
   case x_mom:
-    return _kappa[_qp]*_grad_u[_qp]*_grad_test[_i][_qp];
+//    std::cout<<kappa*_grad_u[_qp]*_grad_test[_i][_qp]<<std::endl;
+    return kappa*_grad_u[_qp]*_grad_test[_i][_qp];
     break;
   case y_mom:
-    return _kappa[_qp]*_grad_u[_qp]*_grad_test[_i][_qp];
+    return kappa*_grad_u[_qp]*_grad_test[_i][_qp];
     break;
   default:
     mooseError("Invalid equation name.");

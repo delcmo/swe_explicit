@@ -1,7 +1,7 @@
 [GlobalParams]
 is_first_order = false
 Ce = 1.
-Cjump = 3.
+Cjump = 4.1
 []
 
 [Mesh]
@@ -16,7 +16,7 @@ Cjump = 3.
   [./ic_func]
     axis = 0
     type = PiecewiseLinear
-    x = '-5  0  0.01 5'
+    x = '-5  0  0.0001 5'
     y = ' 3  3  1    1'
   [../]
 []
@@ -24,13 +24,30 @@ Cjump = 3.
 [UserObjects]
   [./hydro]
     type = HydrostaticPressure
-    gravity = 9.8
+    gravity = 1.
   [../]
   
   [./jump]
     type = JumpInterface
     entropy_flux_x = F_aux
     var_name_jump = jump_aux
+    execute_on = timestep_begin
+  [../]
+
+  [./jump-smooth]
+    type = MaterialSmoothing
+    smoothing_fct_name = average
+    variable = jump_aux
+    var_name = jump_smooth_aux
+    execute_on = timestep_begin
+  [../]
+
+  [./jump-smooth-bis]
+   type = MaterialSmoothing
+   smoothing_fct_name = average
+   variable = jump_smooth_aux
+   var_name = jump_smooth_bis_aux
+   execute_on = timestep_begin
   [../]
 []
 
@@ -65,14 +82,14 @@ Cjump = 3.
     type = WaterHeightEqu
     variable = h
     hu = hu
-    implicit = true
+    implicit = false
   [../]
 
   [./ArtDiffMass]
     type = ArtificialDissipativeFlux
     variable = h
     equ_name = continuity
-    implicit = true
+    implicit = false
   [../]
 
   [./TimeMmom]
@@ -88,14 +105,14 @@ Cjump = 3.
     hu = hu
     component = 0
     eos = hydro
-    implicit = true
+    implicit = false
   [../]
   
   [./ArtDiffMom]
     type = ArtificialDissipativeFlux
     variable = hu
     equ_name = x_mom
-    implicit = true
+    implicit = false
   [../]
 []
 
@@ -136,6 +153,16 @@ Cjump = 3.
   [../]
   
   [./jump_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+
+  [./jump_smooth_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+
+  [./jump_smooth_bis_aux]
     family = MONOMIAL
     order = CONSTANT
   [../]
@@ -201,7 +228,7 @@ Cjump = 3.
     hu = hu
     entropy = entropy_aux
     F = F_aux
-    jump_entropy_flux = jump_aux
+    jump_entropy_flux = jump_smooth_bis_aux
     eos = hydro
   [../]
 []
@@ -243,26 +270,27 @@ Cjump = 3.
     hu = hu
     eos = hydro
     cfl = 1.
-    outputs = none
+#    outputs = none
   [../]
 []
 
 [Executioner]
   type = Transient
-  scheme = 'bdf2' # 'rk-2'
-#  solve_type = 'JFNK'
+  scheme = 'explicit-euler'
+  solve_type = 'LINEAR'
+  dt = 1.e-3
   
-  [./TimeStepper]
-    type = PostprocessorDT
-    postprocessor = dt
-    dt = 1.e-5
-  [../]
+#  [./TimeStepper]
+#    type = PostprocessorDT
+#    postprocessor = dt
+#    dt = 1.e-5
+#  [../]
 
   nl_rel_tol = 1e-12
   nl_abs_tol = 1e-10
-  nl_max_its = 10
+  nl_max_its = 2
 
-  end_time = 0.6
+  end_time = 2.
   num_steps = 200000
 
   [./Quadrature]
@@ -278,5 +306,5 @@ Cjump = 3.
   exodus = true
   print_linear_residuals = false
   print_perf_log = true
-  interval = 10
+  interval = 1
 []

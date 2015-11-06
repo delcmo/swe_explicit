@@ -12,47 +12,38 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ARTIFICIALDISSIPATIVEFLUX_H
-#define ARTIFICIALDISSIPATIVEFLUX_H
+#ifndef AUXVARIABLESICS_H
+#define AUXVARIABLESICS_H
 
-#include "Kernel.h"
+// MOOSE Includes
+#include "InitialCondition.h"
+#include "EquationOfState.h"
 
 // Forward Declarations
-class ArtificialDissipativeFlux;
+class AuxVariablesICs;
 
 template<>
-InputParameters validParams<ArtificialDissipativeFlux>();
+InputParameters validParams<AuxVariablesICs>();
 
-class ArtificialDissipativeFlux : public Kernel
+class AuxVariablesICs : public InitialCondition
 {
 public:
 
-  ArtificialDissipativeFlux(const std::string & name,
-             InputParameters parameters);
+  AuxVariablesICs(const std::string & name,
+            InputParameters parameters);
 
-protected:
+  virtual Real value(const Point & p);
 
-  virtual Real computeQpResidual();
-
-  virtual Real computeQpJacobian();
-
-  virtual Real computeQpOffDiagJacobian(unsigned int _jvar);
-    
 private:
-  // Aux variables
-  VariableValue & _fo_visc;
+  // Parameter
+  Real _Cmax;
+  // Coupled variables
+  VariableValue & _h;
+  VariableValue & _hu;
+  VariableValue & _hv;
 
-  // Equation type
-  enum EquationType
-  {
-      continuity = 0,
-      x_mom = 1,
-      y_mom = 2
-  };
-  MooseEnum _equ_type;
-
-  // Material.
-  const MaterialProperty<Real> & _kappa;
+  // Equation of state
+  const EquationOfState & _eos;
 };
 
-#endif // ARTIFICIALDISSIPATIVEFLUX_H
+#endif // AUXVARIABLESICS_H

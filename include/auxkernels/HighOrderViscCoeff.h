@@ -12,25 +12,25 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef FIRSTORDERVISCCOEFF_H
-#define FIRSTORDERVISCCOEFF_H
+#ifndef HIGHORDERVISCCOEFF_H
+#define HIGHORDERVISCCOEFF_H
 
 #include "AuxKernel.h"
 #include "EquationOfState.h"
 
-class FirstOrderViscCoeff;
+class HighOrderViscCoeff;
 
 template<>
-InputParameters validParams<FirstOrderViscCoeff>();
+InputParameters validParams<HighOrderViscCoeff>();
 
-class FirstOrderViscCoeff : public AuxKernel
+class HighOrderViscCoeff : public AuxKernel
 {
 public:
 
-  FirstOrderViscCoeff(const std::string & name, InputParameters parameters);
+  HighOrderViscCoeff(const std::string & name, InputParameters parameters);
 
 protected:
-  virtual Real computeValue();
+  virtual Real computeValue() {return 0.;};
 
   virtual void compute();
 
@@ -45,4 +45,4 @@ protected:
   const EquationOfState & _eos;
 };
 
-#endif // FIRSTORDERVISCCOEFF_H
+#endif // HIGHORDERVISCCOEFF_H

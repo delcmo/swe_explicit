@@ -10,7 +10,7 @@ Cjump = 4.1
   dim = 1
   xmin = -5.
   xmax = +5
-  nx = 32
+  nx = 256
 []
 
 [Functions]
@@ -67,7 +67,7 @@ Cjump = 4.1
     order = FIRST  
     [./InitialCondition]
       type = ConstantIC
-      value = 0.
+      value = 0.3
     [../]
   [../]
 []
@@ -214,7 +214,7 @@ Cjump = 4.1
   [../]
 
   [./fo_visc_ak]
-    type = FirstOrderViscCoeff
+    type = LowOrderViscCoeff
     variable = fo_visc_aux
     h = h
     hu = hu
@@ -275,14 +275,14 @@ Cjump = 4.1
   [./hu_bc_left]
     type = DirichletBC
     variable = hu
-    value = 0.
+    value = 0.3
     boundary = left
   [../]
 
   [./hu_bc_right]
     type = DirichletBC
     variable = hu
-    value = 0.
+    value = 0.3
     boundary = right
   [../]
 []
@@ -303,7 +303,7 @@ Cjump = 4.1
   type = Transient
   scheme = 'explicit-euler'
   solve_type = 'LINEAR'
-  dt = 0.05
+  dt = 0.01
 
 #  [./TimeStepper]
 #    type = PostprocessorDT
@@ -316,7 +316,7 @@ Cjump = 4.1
   nl_max_its = 30
 
   end_time = 2.
-  num_steps = 2
+#  num_steps = 2
 
   [./Quadrature]
     type = GAUSS
@@ -333,3 +333,8 @@ Cjump = 4.1
   print_perf_log = true
   interval = 1
 []
+
+#[Debug]
+#  show_var_residual_norms = true
+#  show_top_residuals = 100
+#[]

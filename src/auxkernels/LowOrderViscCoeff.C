@@ -14,10 +14,10 @@
 /**
 This function computes the density of the fluid.
 **/
-#include "FirstOrderViscCoeff.h"
+#include "LowOrderViscCoeff.h"
 
 template<>
-InputParameters validParams<FirstOrderViscCoeff>()
+InputParameters validParams<LowOrderViscCoeff>()
 {
   InputParameters params = validParams<AuxKernel>();
 
@@ -33,7 +33,7 @@ InputParameters validParams<FirstOrderViscCoeff>()
   return params;
 }
 
-FirstOrderViscCoeff::FirstOrderViscCoeff(const std::string & name, InputParameters parameters) :
+LowOrderViscCoeff::LowOrderViscCoeff(const std::string & name, InputParameters parameters) :
     AuxKernel(name, parameters),
     // Parameters
     _Cmax(getParam<Real>("Cmax")),
@@ -43,36 +43,46 @@ FirstOrderViscCoeff::FirstOrderViscCoeff(const std::string & name, InputParamete
     _hv(_mesh.dimension() == 2 ? coupledValue("hv") : _zero),
     // Equation of state:
     _eos(getUserObject<EquationOfState>("eos"))
-{}
-
-Real
-FirstOrderViscCoeff::computeValue()
 {
-  // Cell size
-  Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
-
-  // Momentum vector
-  RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
-
-  // Speed of sound
-  Real c2 = _eos.c2(_h[_qp], hU);
-
-  // First-order viscosity coefficient
-  return _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
+  mooseAssert(isNodal(), "The variable is nodal and can only be elemental");
 }
 
+//Real
+//LowOrderViscCoeff::computeValue()
+//{
+//  // Cell size
+//  Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
+//
+//  // Momentum vector
+//  RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
+//
+//  // Speed of sound
+//  Real c2 = _eos.c2(_h[_qp], hU);
+//
+//  // First-order viscosity coefficient
+//  return _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
+//}
+
 void
-FirstOrderViscCoeff::compute()
+LowOrderViscCoeff::compute()
 {
-  if (isNodal())           /* nodal variables */
+  Real fo_visc = 0;
+  for (unsigned int _qp=0; _qp<_qrule->n_points(); _qp++)
   {
-     mooseError("The variable is nodal");
+    // Cell size
+    Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
+
+    // Momentum vector
+    RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
+
+    // Speed of sound
+    Real c2 = _eos.c2(_h[_qp], hU);
+
+    // First-order viscosity coefficient
+    Real fo_visc_qp = _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
+    fo_visc = std::max(fo_visc_qp, fo_visc);
   }
-  else
-  {
-    Real value = 0;
-    for (unsigned int _qp=0; _qp<_qrule->n_points(); _qp++)
-      value = std::max(computeValue(), value);
-    _var.setNodalValue(value);
-  }
+
+  // Return the value
+  _var.setNodalValue(fo_visc);
 }

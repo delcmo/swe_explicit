@@ -17,7 +17,7 @@
 #include "EnergySw.h"
 #include "EnergyFluxSw.h"
 #include "FroudeNumberAux.h"
-#include "FirstOrderViscCoeff.h"
+#include "LowOrderViscCoeff.h"
 
 // ics
 #include "StepIC.h"
@@ -105,7 +105,7 @@ SweExplicitApp::registerObjects(Factory & factory)
   registerAux(EnergySw);
   registerAux(EnergyFluxSw);
   registerAux(FroudeNumberAux);
-  registerAux(FirstOrderViscCoeff);
+  registerAux(LowOrderViscCoeff);
 
   // ics
   registerInitialCondition(StepIC);

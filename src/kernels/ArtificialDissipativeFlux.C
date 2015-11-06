@@ -46,17 +46,20 @@ Real ArtificialDissipativeFlux::computeQpResidual()
 //  Real kappa = _kappa[_qp];
   Real kappa = _fo_visc[_qp];
 
-  std::cout<<"=========================="<<std::endl;
-  std::cout<<"kappa="<<kappa<<std::endl;
+//  std::cout<<"=========================="<<std::endl;
+//  std::cout<<_qp<<std::endl;
+//  std::cout<<_current_elem[0]<<std::endl;
+//  std::cout.precision(10);
+//  std::cout<<"kappa="<<kappa<<" and grad_u="<<_grad_u[_qp](0)<<std::endl;
 
   switch (_equ_type)
   {
   case continuity:
-//    std::cout<<"cont="<<kappa*_grad_u[_qp]*_grad_test[_i][_qp]<<std::endl;
+//    std::cout<<"cont="<<kappa*_grad_u[_qp](0)<<std::endl;
     return kappa*_grad_u[_qp]*_grad_test[_i][_qp];
     break;
   case x_mom:
-//    std::cout<<kappa*_grad_u[_qp]*_grad_test[_i][_qp]<<std::endl;
+//    std::cout<<"mom="<<kappa*_grad_u[_qp](0)<<std::endl;
     return kappa*_grad_u[_qp]*_grad_test[_i][_qp];
     break;
   case y_mom:

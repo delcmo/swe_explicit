@@ -39,8 +39,12 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int _jvar);
     
 private:
+  // Parameter
+  bool _use_first_order;
+
   // Aux variables
   VariableValue & _fo_visc;
+  VariableValue & _ho_visc;
 
   // Equation type
   enum EquationType

@@ -21,8 +21,11 @@ InputParameters validParams<ArtificialDissipativeFlux>()
 {
   InputParameters params = validParams<Kernel>();
 
+  // Parameter
+  params.addParam<bool>("use_first_order", false, "if true, use the first-order viscosity coefficient");
   // Coupled aux variables
   params.addCoupledVar("fo_visc_coeff", "first-order viscosity coefficient aux variable");
+  params.addCoupledVar("ho_visc_coeff", "high-order viscosity coefficient aux variable");
   // Equation name:
   params.addParam<std::string>("equ_name", "invalid", "Name of the equation.");
 
@@ -32,8 +35,11 @@ InputParameters validParams<ArtificialDissipativeFlux>()
 ArtificialDissipativeFlux::ArtificialDissipativeFlux(const std::string & name,
                        InputParameters parameters) :
   Kernel(name, parameters),
+    // Parameters
+    _use_first_order(getParam<bool>("use_first_order")),
     // Coupled aux variables
     _fo_visc(isCoupled("fo_visc_coeff") ? coupledValue("fo_visc_coeff") : _zero),
+    _ho_visc(isCoupled("ho_visc_coeff") ? coupledValue("ho_visc_coeff") : _zero),
     // Equation name
     _equ_type("continuity x_mom y_mom invalid", getParam<std::string>("equ_name")),
     // Material
@@ -44,7 +50,8 @@ ArtificialDissipativeFlux::ArtificialDissipativeFlux(const std::string & name,
 Real ArtificialDissipativeFlux::computeQpResidual()
 {
 //  Real kappa = _kappa[_qp];
-  Real kappa = _fo_visc[_qp];
+  Real ho_visc = _t_step < 2 ? _fo_visc[_qp] : _ho_visc[_qp];
+  Real kappa = _use_first_order ? _fo_visc[_qp] : std::min(_fo_visc[_qp], ho_visc);
 
 //  std::cout<<"=========================="<<std::endl;
 //  std::cout<<_qp<<std::endl;

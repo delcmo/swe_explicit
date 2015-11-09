@@ -37,6 +37,7 @@ protected:
   // Parameters
   Real _Cmax;
 
+  // Variables
   VariableValue & _h;
   VariableValue & _hu;
   VariableValue & _hv;

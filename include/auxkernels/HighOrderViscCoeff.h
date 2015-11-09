@@ -35,11 +35,21 @@ protected:
   virtual void compute();
 
   // Parameters
-  Real _Cmax;
+  Real _Ce;
+  Real _Cjump;
 
+  // Variables
   VariableValue & _h;
-  VariableValue & _hu;
-  VariableValue & _hv;
+
+  // Coupled aux variables: entropy
+  VariableValue & _E;
+  VariableValue & _E_old;
+  VariableValue & _E_older;
+
+  // Coupled aux variables: entropy flux
+  VariableGradient & _F_grad_old;
+  VariableGradient & _G_grad_old;
+  VariableValue & _jump;
 
   // Equation of state
   const EquationOfState & _eos;

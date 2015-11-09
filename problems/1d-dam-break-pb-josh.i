@@ -1,6 +1,7 @@
 [GlobalParams]
 lumping = true
 is_first_order = true
+use_first_order = true
 Ce = 1.
 Cjump = 4.1
 []
@@ -10,7 +11,7 @@ Cjump = 4.1
   dim = 1
   xmin = -5.
   xmax = +5
-  nx = 256
+  nx = 32
 []
 
 [Functions]
@@ -145,6 +146,11 @@ Cjump = 4.1
     order = CONSTANT
   [../]
 
+  [./ho_visc_aux]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+
   [./kappa_aux]
     family = MONOMIAL
     order = CONSTANT
@@ -218,6 +224,16 @@ Cjump = 4.1
     variable = fo_visc_aux
     h = h
     hu = hu
+    eos = hydro
+    execute_on = 'initial linear'
+  [../]
+
+  [./ho_visc_ak]
+    type = HighOrderViscCoeff
+    variable = ho_visc_aux
+    h = h
+    entropy = entropy_aux
+    F = F_aux
     eos = hydro
     execute_on = 'initial linear'
   [../]
@@ -316,13 +332,12 @@ Cjump = 4.1
   nl_max_its = 30
 
   end_time = 2.
-#  num_steps = 2
+  num_steps = 2
 
   [./Quadrature]
     type = GAUSS
     order = SECOND
   [../]
-  compute_aux_inital = true
 []
 
 [Outputs]

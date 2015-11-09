@@ -11,9 +11,7 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-/**
-This function computes the density of the fluid.
-**/
+
 #include "LowOrderViscCoeff.h"
 
 template<>
@@ -47,42 +45,29 @@ LowOrderViscCoeff::LowOrderViscCoeff(const std::string & name, InputParameters p
   mooseAssert(isNodal(), "The variable is nodal and can only be elemental");
 }
 
-//Real
-//LowOrderViscCoeff::computeValue()
-//{
-//  // Cell size
-//  Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
-//
-//  // Momentum vector
-//  RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
-//
-//  // Speed of sound
-//  Real c2 = _eos.c2(_h[_qp], hU);
-//
-//  // First-order viscosity coefficient
-//  return _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
-//}
-
 void
 LowOrderViscCoeff::compute()
 {
+  // Cell size
+  Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
+
+  // Initialize the value storing the first-order visc coeff
   Real fo_visc = 0;
+
+  // Loop over the quad pt
   for (unsigned int _qp=0; _qp<_qrule->n_points(); _qp++)
   {
-    // Cell size
-    Real h_cell = std::pow(_current_elem->volume(),1./_mesh.dimension());
-
-    // Momentum vector
+    // Momentum vector at quad pt
     RealVectorValue hU(_hu[_qp], _hv[_qp], 0.);
 
-    // Speed of sound
+    // Speed of sound at quad pt
     Real c2 = _eos.c2(_h[_qp], hU);
 
-    // First-order viscosity coefficient
+    // First-order viscosity coefficient at quad pt
     Real fo_visc_qp = _Cmax*h_cell*(hU.size()/_h[_qp]+std::sqrt(c2));
     fo_visc = std::max(fo_visc_qp, fo_visc);
   }
 
-  // Return the value
+  // Return the piecewise constant value
   _var.setNodalValue(fo_visc);
 }
